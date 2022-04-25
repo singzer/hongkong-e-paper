@@ -119,13 +119,13 @@
         <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
       </div>
     </el-dialog> -->
-
-    <table-content></table-content>
-    <el-row>
+    <el-row style="position:fixed;bottom:0px;right:4%">
       <el-button type="primary" id="btn">批量下发</el-button>
     </el-row>
+    <table-content></table-content>
+    
 
-    <div class="interval" id="bottom">1222222222222222</div>
+    <!-- <div class="interval" id="bottom"></div> -->
   </div>
 </template>
 
@@ -266,9 +266,8 @@ export default {
   #bottom {
     position: flex;
     /* bottom: 999; */
-    z-index: 999;
-    top: 20px;
-
+    /* z-index: 999; */
+    /* top: 20px; */
   }
 
   .el-table{
@@ -277,7 +276,6 @@ export default {
   }
 
   #btn{
-    /* display:inline-block; */
     float: right;
     margin-right: 2%;
     margin-top: 1%;
