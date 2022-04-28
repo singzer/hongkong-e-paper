@@ -14,12 +14,8 @@ export default {
            imgURL:"http://sm.singzer.cn/epd/img.bmp"
         }
     },
-    mounted(){
-
-    },
-    beforeCreate(){
-      
-    }
+    
+    
 }
 </script>
 

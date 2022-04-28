@@ -17,7 +17,7 @@
       <el-table-column prop="lastTime" label="最后上线时间"></el-table-column>
       <el-table-column prop="operate" label="操作" width="300">
         <template slot-scope="scope">
-          <el-button type="text" :id="scope.index" @click="openFullScreen1(scope.$index)" v-loading.fullscreen.lock="fullscreenLoading"
+          <el-button type="text" :id="scope.index" @click="openFullScreen1(scope.$index)"
             >编辑设备</el-button
           >&nbsp;&nbsp;&nbsp;&nbsp;
           <el-button type="text">下发内容</el-button>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -29,17 +29,12 @@
     <el-dialog title="编辑设备" :visible.sync="dialogFormVisible" id="formcss">
       <el-row>
         <el-col :span="12">
-          <form-paper :templateScreen="templateScreen"></form-paper>
+          <form-paper :templateScreen="templateScreen" :formID="formID"></form-paper>
         </el-col>
         <el-col :span="12">
-          <paper-show></paper-show>
+          <paper-show v-loading="fullscreenLoading"></paper-show>
         </el-col>
       </el-row>
-
-      <!-- <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-      </div> -->
     </el-dialog>
   </div>
 </template>
@@ -54,6 +49,7 @@ export default {
     return {
       tableData: [
       ],
+      formID:12,
       fullscreenLoading: false,
       // 隐藏框
       dialogTableVisible: false,
@@ -73,23 +69,12 @@ export default {
         setTimeout(() => {
           this.fullscreenLoading = false;
         }, 3000);
+        this.formID = this.tableData[e].id
+        // console.log(this.ID)
         this.fullscreenLoading = true;
         this.dialogFormVisible = true;
       },
-    // openFullScreen2(e) {
-    //   this.fullscreenLoading = true;
-    //   this.templateScreen = this.tableData[e].model;
-    //   this.dialogFormVisible = true;
-    //   const loading = this.$loading({
-    //     lock: true,
-    //     text: 'Loading',
-    //     spinner: 'el-icon-loading',
-    //     background: 'rgba(0, 0, 0, 0.7)'
-    //   });
-    //   setTimeout(() => {
-    //     loading.close();
-    //   }, 2000);
-    // }
+    
   },
   mounted() {
     this.$ajax.get("/api/epd/devices").then(res => {
@@ -108,6 +93,7 @@ export default {
         refreshTime: "",
         lastTime: "",
         operate: "",
+        id:null
       };
         tableData.ip = res.data[i].ip
         tableData.mac = res.data[i].mac
@@ -117,6 +103,7 @@ export default {
         tableData.refreshTime = new Date(res.data[i].UpdatedAt).toLocaleString()
         tableData.lastTime = new Date(res.data[i].last_refresh_at).toLocaleString()
         tableData.ssid = res.data[i].ssid
+        tableData.id = res.data[i].ID
         switch (res.data[i].epd_width){
           case 640:
             tableData.model = "7.5寸黑白红";

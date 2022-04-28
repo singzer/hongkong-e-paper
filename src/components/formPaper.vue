@@ -33,7 +33,7 @@
         </el-form-item>
         <el-form-item>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
+        <el-button type="primary" @click="subForm"
             >确 定</el-button
         >
     </el-form-item>
@@ -51,15 +51,13 @@ export default {
             type: String,
             default: '请选择活动区域'
         },
+        formID:{
+            type: Number,
+            default:12
+        }
     },
     data(){
-        // let validateForm = (rule, value, callback) => {
-        //     if (String(value).length > 6) {
-        //         callback(new Error('超出限制'));
-        //     } else {
-        //         callback();
-        //     }
-        // };
+      
         return {
             form: {
                 templateScreen: "",
@@ -70,6 +68,7 @@ export default {
                 describe: "",
                 meetName: "",
                 state: "",
+                // eID:null,
             },
             rules:{
                 checkActiveName: [
@@ -80,6 +79,16 @@ export default {
             formLabelWidth: "120px",
             labelPosition: "right",
         }
+    },
+    methods:{
+        subForm(){
+            // this.$ajax.post(`/api/devece/${this.eID}/setTemp`)
+            console.log(this.formID)
+        }
+    },
+    beforeMount(){
+        let id = this.formID
+        console.log(id)
     }
 }
 </script>
