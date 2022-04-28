@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :label-position="labelPosition" :model="form">
+    <el-form :label-position="labelPosition" :model="form" :rules="rules">
         <el-form-item label="模板画面">
         <el-select :placeholder="templateScreen" :disabled="true">
             <el-option label="区域一" value="shanghai"></el-option>
@@ -13,14 +13,14 @@
             <el-option label="区域二" value="beijing"></el-option>
         </el-select>
         </el-form-item>
-        <el-form-item label="活动名称" >
-        <el-input v-model="form.activeName"></el-input>
+        <el-form-item label="活动名称" prop="checkActiveName">
+        <el-input v-model="form.activeName" minlength="4" maxlength="8" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="会议场所">
-        <el-input v-model="form.meetAdr"></el-input>
+        <el-input v-model="form.meetAdr" minlength="4" maxlength="8" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="姓名">
-        <el-input v-model="form.name"></el-input>
+        <el-input v-model="form.name" minlength="2" maxlength="4" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="职称或描述">
         <el-input v-model="form.describe"></el-input>
@@ -53,6 +53,13 @@ export default {
         },
     },
     data(){
+        // let validateForm = (rule, value, callback) => {
+        //     if (String(value).length > 6) {
+        //         callback(new Error('超出限制'));
+        //     } else {
+        //         callback();
+        //     }
+        // };
         return {
             form: {
                 templateScreen: "",
@@ -63,6 +70,12 @@ export default {
                 describe: "",
                 meetName: "",
                 state: "",
+            },
+            rules:{
+                checkActiveName: [
+                    // { validator: validateForm, trigger: 'blur' },
+                    { max:8, message: '不能超过8个字符',  trigger: 'blur'}
+                ]
             },
             formLabelWidth: "120px",
             labelPosition: "right",

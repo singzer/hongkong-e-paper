@@ -1,5 +1,5 @@
 <template>
-  <div id="table-content">
+  <div class="table-content">
     <el-table :data="tableData" style="width: 100%; font-size: 15px">
       <el-table-column prop="model" label="屏幕型号"> </el-table-column>
       <el-table-column prop="ip" label="设备IP"> </el-table-column>
@@ -17,7 +17,7 @@
       <el-table-column prop="lastTime" label="最后上线时间"></el-table-column>
       <el-table-column prop="operate" label="操作" width="300">
         <template slot-scope="scope">
-          <el-button type="text" :id="scope.index" @click="test(scope.$index)"
+          <el-button type="text" :id="scope.index" @click="openFullScreen1(scope.$index)" v-loading.fullscreen.lock="fullscreenLoading"
             >编辑设备</el-button
           >&nbsp;&nbsp;&nbsp;&nbsp;
           <el-button type="text">下发内容</el-button>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -53,82 +53,9 @@ export default {
   data() {
     return {
       tableData: [
-        {
-          model: "7.5英寸黑白红",
-          ip: "192.168.1.3",
-          mac: "00:00:00:00:00:00",
-          ssid: "singzer",
-          signal: "-50db",
-          battery: "100%",
-          templateNumber: "1",
-          state: "正常",
-          refreshTime: "2022/3/23 16:36:18",
-          lastTime: "2022/3/23 16:36:18",
-          operate: "操作   编辑    上传",
-        },
-        {
-          model: "7.5英寸黑白红",
-          ip: "192.168.1.3",
-          mac: "00:00:00:00:00:00",
-          ssid: "singzer",
-          signal: "-50db",
-          battery: "100%",
-          templateNumber: "1",
-          state: "正常",
-          refreshTime: "2022/3/23 16:36:18",
-          lastTime: "2022/3/23 16:36:18",
-          operate: "操作",
-        },
-        {
-          model: "7.5英寸黑白红",
-          ip: "192.168.1.3",
-          mac: "00:00:00:00:00:00",
-          ssid: "singzer",
-          signal: "-50db",
-          battery: "100%",
-          templateNumber: "1",
-          state: "正常",
-          refreshTime: "2022/3/23 16:36:18",
-          lastTime: "2022/3/23 16:36:18",
-          operate: "操作",
-        },
-        {
-          model: "7.5英寸黑白红",
-          ip: "192.168.1.3",
-          mac: "00:00:00:00:00:00",
-          ssid: "singzer",
-          signal: "-50db",
-          battery: "100%",
-          templateNumber: "1",
-          state: "正常",
-          refreshTime: "2022/3/23 16:36:18",
-          lastTime: "2022/3/23 16:36:18",
-          operate: "操作",
-        },
       ],
+      fullscreenLoading: false,
       // 隐藏框
-      gridData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-      ],
       dialogTableVisible: false,
       dialogFormVisible: false,
       templateScreen:"232323",
@@ -140,12 +67,81 @@ export default {
       this.templateScreen = this.tableData[e].model;
       this.dialogFormVisible = true;
     },
+    openFullScreen1(e) {
+        
+        this.templateScreen = this.tableData[e].model;
+        setTimeout(() => {
+          this.fullscreenLoading = false;
+        }, 3000);
+        this.fullscreenLoading = true;
+        this.dialogFormVisible = true;
+      },
+    // openFullScreen2(e) {
+    //   this.fullscreenLoading = true;
+    //   this.templateScreen = this.tableData[e].model;
+    //   this.dialogFormVisible = true;
+    //   const loading = this.$loading({
+    //     lock: true,
+    //     text: 'Loading',
+    //     spinner: 'el-icon-loading',
+    //     background: 'rgba(0, 0, 0, 0.7)'
+    //   });
+    //   setTimeout(() => {
+    //     loading.close();
+    //   }, 2000);
+    // }
   },
+  mounted() {
+    this.$ajax.get("/api/epd/devices").then(res => {
+      console.log(res.data)
+
+      for(let i = 0; i < res.data.length; i++ ){
+        let tableData = {
+        model: "",
+        ip: "",
+        mac: "",
+        ssid: "",
+        signal: "",
+        battery: "",
+        templateNumber: "",
+        state: "",
+        refreshTime: "",
+        lastTime: "",
+        operate: "",
+      };
+        tableData.ip = res.data[i].ip
+        tableData.mac = res.data[i].mac
+        tableData.signal = res.data[i].rssi.length >0 ? res.data[i].rssi + "db" : ""
+        tableData.battery = res.data[i].epd_ver + "%"
+        tableData.templateNumber = res.data[i].ID
+        tableData.refreshTime = new Date(res.data[i].UpdatedAt).toLocaleString()
+        tableData.lastTime = new Date(res.data[i].last_refresh_at).toLocaleString()
+        tableData.ssid = res.data[i].ssid
+        switch (res.data[i].epd_width){
+          case 640:
+            tableData.model = "7.5寸黑白红";
+            break;
+          case 400:
+            tableData.model = "4.2寸黑白红"
+            break;
+        }
+        if(res.data[i].battery_is_charging == true){
+          tableData.state = "正常"
+        }else{
+          tableData.state = "不正常"
+        }
+        this.tableData.push(tableData)
+        // console.log(tableData)
+      }
+    })
+    document.getElementsByClassName('el-table__body-wrapper')[0].style.overflowX = 'clip';
+  },
+  
 };
 </script>
 
 <style>
-#table-content{
+.table-content{
   margin-left: 3%;
   margin-right: 3%;
   font-weight: lighter;
@@ -165,6 +161,11 @@ span{
   font-size: 15px;
 }
 
+.el-dialog{
+    width: 1000px;
+    height: 600px;
+  }
+
 /* @media (min-width: 1200px) and (max-width: 2000px){
   .el-dialog{
     width: 1000px;
@@ -173,9 +174,6 @@ span{
 } */
 
 @media (max-width: 1200px) {
-  .el-dialog{
-    width: 500px;
-    height: 300px;
-  }
+  
 }
 </style>
