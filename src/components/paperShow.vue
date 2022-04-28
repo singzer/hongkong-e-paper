@@ -2,20 +2,57 @@
   <div>
     <el-card class="box-card">
       <!-- src="http://sm.singzer.cn/epd/img.bmp" -->
-          <img id="e-paper" v-lazy="imgURL" />
+          <img id="e-paper" v-lazy="imgURLFormat" />
     </el-card>
   </div>
 </template>
 
 <script>
+import {Base64} from 'js-base64'
 export default {
+    props:{
+      ePaperTemplate:{
+            type: Object,
+            default:function(){
+                return {
+                    width:'',
+                    height:'',
+                    temp_data:{
+                          title: null,
+                          user: "用户名",
+                          test: "测试",
+                          meetRoom: "会议室",
+                          meetYMD: "2000-01-01",
+                          meetStart: "14:30",
+                          meetEnd: "15:30",
+                          meetState: "会议中",
+                    },
+                    temp_name:'名字',
+            }
+          }
+        },
+      
+      // formFormData
+      fromFormData:{
+        type: String,
+      }
+    },
     data() {
         return {
-           imgURL:"http://sm.singzer.cn/epd/img.bmp"
+           imgURL:""
         }
     },
-    
-    
+    computed:{
+        // 图片路径
+        imgURLFormat(){
+          console.log(this.ePaperTemplate)
+            let dataJson = JSON.stringify(this.ePaperTemplate.temp_data);
+            let data = Base64.encode(dataJson);
+            let width = this.ePaperTemplate.width;
+            let height = this.ePaperTemplate.height;
+            return `http://sm.singzer.cn/epd/img.bmp?width=${width}&${height}&data=${data}`;
+        }
+    },
 }
 </script>
 

@@ -22,73 +22,9 @@ export default {
   name: 'App',
   data(){
     return {
-      tableData: [{
-            model: '7.5英寸黑白红',
-            ip: '192.168.1.3',
-            mac: '00:00:00:00:00:00',
-            ssid: 'singzer',
-            signal: '-50db',
-            battery: '100%',
-            templateNumber: '1',
-            state: '正常',
-            refreshTime: '2022/3/23 16:36:18',
-            lastTime: '2022/3/23 16:36:18',
-            operate: '操作   编辑    上传'
-          }, {
-            model: '7.5英寸黑白红',
-            ip: '192.168.1.3',
-            mac: '00:00:00:00:00:00',
-            ssid: 'singzer',
-            signal: '-50db',
-            battery: '100%',
-            templateNumber: '1',
-            state: '正常',
-            refreshTime: '2022/3/23 16:36:18',
-            lastTime: '2022/3/23 16:36:18',
-            operate: '操作'
-          }, {
-            model: '7.5英寸黑白红',
-            ip: '192.168.1.3',
-            mac: '00:00:00:00:00:00',
-            ssid: 'singzer',
-            signal: '-50db',
-            battery: '100%',
-            templateNumber: '1',
-            state: '正常',
-            refreshTime: '2022/3/23 16:36:18',
-            lastTime: '2022/3/23 16:36:18',
-            operate: '操作'
-          }, {
-            model: '7.5英寸黑白红',
-            ip: '192.168.1.3',
-            mac: '00:00:00:00:00:00',
-            ssid: 'singzer',
-            signal: '-50db',
-            battery: '100%',
-            templateNumber: '1',
-            state: '正常',
-            refreshTime: '2022/3/23 16:36:18',
-            lastTime: '2022/3/23 16:36:18',
-            operate: '操作'
-          }],
+      tableData: [],
           // 隐藏框
-      gridData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
+      gridData: [],
         dialogTableVisible: false,
         dialogFormVisible: false,
         form: {

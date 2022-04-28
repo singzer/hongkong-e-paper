@@ -13,9 +13,6 @@
             <el-option label="区域二" value="beijing"></el-option>
         </el-select>
         </el-form-item>
-        <el-form-item label="活动名称" prop="checkActiveName">
-        <el-input v-model="form.activeName" minlength="4" maxlength="8" show-word-limit></el-input>
-        </el-form-item>
         <el-form-item label="会议场所">
         <el-input v-model="form.meetAdr" minlength="4" maxlength="8" show-word-limit></el-input>
         </el-form-item>
@@ -33,7 +30,7 @@
         </el-form-item>
         <el-form-item>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="subForm"
+        <el-button type="primary" @click="subForm" :plain="true"
             >确 定</el-button
         >
     </el-form-item>
@@ -62,7 +59,6 @@ export default {
             form: {
                 templateScreen: "",
                 templateContent: "",
-                activeName: "",
                 meetAdr: "",
                 name: "",
                 describe: "",
@@ -81,9 +77,24 @@ export default {
         }
     },
     methods:{
+        // 提交表单给paperPaper组件
         subForm(){
-            // this.$ajax.post(`/api/devece/${this.eID}/setTemp`)
-            console.log(this.formID)
+            
+            let dataJson = JSON.stringify({temp_name:"1212",temp_data:this.form})
+            console.log(dataJson)
+            this.$ajax({
+                method: "post",
+                url: `/api/epd/device/${this.formID}/setTemp`,
+                data: dataJson,
+                dataType:"json",
+            }).then(res=>{
+                console.log(res)
+                if(res.code == 200){
+                    this.$message('上传成功')
+                }else{
+                    this.$message('上传失败')
+                }
+            })
         }
     },
     beforeMount(){
