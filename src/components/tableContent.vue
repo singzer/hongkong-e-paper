@@ -29,10 +29,10 @@
     <el-dialog title="编辑设备" :visible.sync="dialogFormVisible" id="formcss">
       <el-row>
         <el-col :span="12">
-          <form-paper :templateScreen="templateScreen" :formID="formID"></form-paper>
+          <form-paper :templateScreen="templateScreen" :formID="formID" @formMes="imgURLMes"></form-paper>
         </el-col>
         <el-col :span="12">
-          <paper-show v-loading="fullscreenLoading" :ePaperTemplate="ePaperTemplate" ></paper-show>
+          <paper-show v-loading="fullscreenLoading" :ePaperTemplate="ePaperTemplate" :imgURL="imgURL"></paper-show>
         </el-col>
       </el-row>
     </el-dialog>
@@ -83,6 +83,7 @@ export default {
         temp_name:'名字',
       },
       formPaperData:"",
+      imgURL:"",
     };
   },
   methods: {
@@ -90,6 +91,9 @@ export default {
       console.log(this.tableData[e].model);
       this.templateScreen = this.tableData[e].model;
       this.dialogFormVisible = true;
+    },
+    imgURLMes(e){
+      this.imgURL = e;
     },
     // 展示编辑页面
     openFormScreen(e) {
@@ -162,7 +166,7 @@ export default {
         tableData.ip = res.data[i].ip
         tableData.mac = res.data[i].mac
         tableData.signal = res.data[i].rssi.length >0 ? res.data[i].rssi + "db" : ""
-        tableData.battery = res.data[i].epd_ver + "%"
+        tableData.battery = res.data[i].battery_percentage + "%"
         tableData.templateNumber = res.data[i].ID
         tableData.refreshTime = new Date(res.data[i].UpdatedAt).toLocaleString()
         tableData.lastTime = new Date(res.data[i].last_refresh_at).toLocaleString()
@@ -171,14 +175,15 @@ export default {
         tableData.width = res.data[i].epd_width
         tableData.height = res.data[i].epd_height
         tableData.temp_name = res.data[i].temp_name
-        switch (res.data[i].epd_width){
-          case 640:
-            tableData.model = "7.5寸黑白红";
-            break;
-          case 400:
-            tableData.model = "4.2寸黑白红"
-            break;
-        }
+        tableData.model = res.data[i].epd_ver.length > 0 ? res.data[i].epd_ver + "-" + res.data[i].epd_width + "*" + res.data[i].epd_height : res.data[i].epd_width + "*" + res.data[i].epd_height
+        // switch (res.data[i].epd_width){
+        //   case 640:
+        //     tableData.model = "7.5寸黑白红";
+        //     break;
+        //   case 400:
+        //     tableData.model = "4.2寸黑白红"
+        //     break;
+        // }
         if(res.data[i].battery_is_charging == true){
           tableData.state = "正常"
         }else{

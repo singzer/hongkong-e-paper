@@ -8,9 +8,13 @@
         </el-select>
         </el-form-item>
         <el-form-item label="内容模板">
-        <el-select v-model="form.templateContent"  placeholder="请选择活动区域">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+        <el-select v-model="form.templateContent"  placeholder="请选择活动区域" @change="selectChange">
+            <el-option label="会议桌签1" value="会议桌签1"></el-option>
+            <el-option label="会议桌签2" value="会议桌签2"></el-option>
+            <el-option label="图书馆引导牌1" value="图书馆引导牌1"></el-option>
+            <el-option label="图书馆引导牌2" value="图书馆引导牌2"></el-option>
+            <el-option label="图书馆引导牌3" value="图书馆引导牌3"></el-option>
+            <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option>
         </el-select>
         </el-form-item>
         <el-form-item label="会议场所">
@@ -29,9 +33,9 @@
         <el-input v-model="form.state"></el-input>
         </el-form-item>
         <el-form-item>
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="preview" >预 览</el-button>
         <el-button type="primary" @click="subForm" :plain="true"
-            >确 定</el-button
+            >上 传</el-button
         >
     </el-form-item>
     </el-form>
@@ -42,6 +46,7 @@
 </template>
 
 <script>
+import {Base64} from 'js-base64'
 export default {
     props: {
         templateScreen: {
@@ -51,20 +56,20 @@ export default {
         formID:{
             type: Number,
             default:12
-        }
+        },
+        
     },
     data(){
       
         return {
             form: {
-                templateScreen: "",
-                templateContent: "",
-                meetAdr: "",
-                name: "",
-                describe: "",
-                meetName: "",
-                state: "",
-                // eID:null,
+                templateScreen: "", // 屏幕型号
+                templateContent: "", // 内容模板
+                meetAdr: "", // 会议场所
+                name: "", // 姓名
+                describe: "", // 职称或描述
+                meetName: "", // 会议名称
+                state: "", // 状态
             },
             rules:{
                 checkActiveName: [
@@ -77,6 +82,15 @@ export default {
         }
     },
     methods:{
+        // 预览
+        preview(){
+            let dataJson = JSON.stringify(this.form)
+            let data = Base64.encode(dataJson)
+            // this.$refs.ttt.imgURL = `/api/form/preview?data=${data}`
+            console.log(data)
+            this.$emit('formMes',data)
+        },
+
         // 提交表单给paperPaper组件
         subForm(){
             
@@ -95,8 +109,14 @@ export default {
                     this.$message('上传失败')
                 }
             })
+        },
+
+        // selectChange
+        selectChange(value){
+            console.log(value)
         }
     },
+
     beforeMount(){
         let id = this.formID
         console.log(id)

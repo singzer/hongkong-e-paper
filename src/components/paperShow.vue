@@ -2,13 +2,13 @@
   <div>
     <el-card class="box-card">
       <!-- src="http://sm.singzer.cn/epd/img.bmp" -->
-          <img id="e-paper" v-lazy="imgURLFormat" />
+          <img id="e-paper" v-lazy="imgURLFormat" ref="ttt" @click="test"/>
     </el-card>
   </div>
 </template>
 
 <script>
-import {Base64} from 'js-base64'
+// import {Base64} from 'js-base64'
 export default {
     props:{
       ePaperTemplate:{
@@ -31,27 +31,32 @@ export default {
             }
           }
         },
+      imgURL:{
+        type:String,
+        default:'1212'
+      }
       
       // formFormData
-      fromFormData:{
-        type: String,
-      }
     },
     data() {
         return {
-           imgURL:""
+          //  imgURL:""
         }
     },
     computed:{
         // 图片路径
         imgURLFormat(){
-          console.log(this.ePaperTemplate)
-            let dataJson = JSON.stringify(this.ePaperTemplate.temp_data);
-            let data = Base64.encode(dataJson);
+          // console.log(this.ePaperTemplate)
             let width = this.ePaperTemplate.width;
             let height = this.ePaperTemplate.height;
-            return `http://sm.singzer.cn/epd/img.bmp?width=${width}&${height}&data=${data}`;
+            
+            return `https://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&data=${this.imgURL}`;
         }
+    },
+    methods:{
+      test(){
+        console.log(this.imgURL);
+      }
     },
 }
 </script>
