@@ -2,7 +2,7 @@
   <div>
     <el-card class="box-card">
       <!-- src="http://sm.singzer.cn/epd/img.bmp" -->
-          <img id="e-paper" v-lazy="imgURLFormat" ref="ttt" @click="test"/>
+          <img id="e-paper" :src="imgURLFormat"  :key="imgKey"/>
     </el-card>
   </div>
 </template>
@@ -33,8 +33,16 @@ export default {
         },
       imgURL:{
         type:String,
-        default:'1212'
-      }
+        default:"eyJuYW1lIjoiMTMxMyIsIm1lZXRBZHIiOiIxMzEzIiwiZGVzY3JpYmUiOiIxMzExMzIiLCJtZWV0TmFtZSI6IjEzMjEzIiwic3RhdGUiOiIxMzIxMyIsInN0YXJ0VGltZSI6IjIwMjItNC0zMCIsImVuZFRpbWUiOiIwOjU3OjM4In0="
+      },
+      imgKey:{
+        type:Number,
+        default:0
+      },
+      paperID:{
+        type:Number,
+        default:0
+      },
       
       // formFormData
     },
@@ -49,15 +57,33 @@ export default {
           // console.log(this.ePaperTemplate)
             let width = this.ePaperTemplate.width;
             let height = this.ePaperTemplate.height;
-            
-            return `https://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&data=${this.imgURL}`;
+            if(this.imgURL == ""){
+              return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&data=eyJuYW1lIjoiMTMxMyIsIm1lZXRBZHIiOiIxMzEzIiwiZGVzY3JpYmUiOiIxMzExMzIiLCJtZWV0TmFtZSI6IjEzMjEzIiwic3RhdGUiOiIxMzIxMyIsInN0YXJ0VGltZSI6IjIwMjItNC0zMCIsImVuZFRpbWUiOiIwOjU3OjM4In0=`;
+            }
+            return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&data=${this.imgURL}`;
         }
     },
-    methods:{
-      test(){
-        console.log(this.imgURL);
-      }
+    mounted(){
+      console.log("mounted")
+      console.log(this.paperID)
+      let width = this.$store.state.tableData[this.paperID].epd_width;
+      let height = this.$store.state.tableData[this.paperID].epd_height;
+      console.log(height)
+      let xy = width / 390;
+      height = height / xy;
+      
+      document.getElementById("e-paper").style.width = 390 + "px";
+      document.getElementById("e-paper").style.height = height + "px";
     },
+    created(){
+       console.log("created")
+      // let width = this.$store.state.tableData[this.paperID].epd_width;
+      // let height = this.$store.state.tableData[this.paperID].epd_height;
+      // let xy = width / 390;
+      // height = height / xy;
+      // document.getElementById("e-paper").style.width = 390 + "px";
+      // document.getElementById("e-paper").style.height = height + "px";
+    }
 }
 </script>
 

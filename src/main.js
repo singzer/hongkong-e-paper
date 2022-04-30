@@ -3,7 +3,10 @@ import App from './App.vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import axios from 'axios'
-import VueLazyLoad from 'vue-lazyload'
+// import VueLazyLoad from 'vue-lazyload'
+// import Vuex from 'vuex'
+import Vuex from 'vuex'
+Vue.use(Vuex)
 
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-fromurlencodeed';
@@ -21,15 +24,45 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error);
 });
 
+// Vuex
+// 创建一个新的 store 实例
+// let store = Vuex.createStore({
+//   state () {
+//     return {
+//       tableData: [],
+//     }
+//   },
+//   mutations: {
+//     setTableData (state, data) {
+//       console.log(data)
+//       state.tableData = data
+//     }
+//   }
+// })
+
+let store = new Vuex.Store({
+  state: {
+    tableData: [],
+  },
+  mutations: {
+    setTableData (state, data) {
+      console.log(data)
+      state.tableData = data
+    }
+  }
+})
+
 
 Vue.config.productionTip = false
 // Vue.use(axios)
 Vue.prototype.$ajax = axios
 
-Vue.use(VueLazyLoad,{
+// Vue.use(VueLazyLoad,{
   
-})
+// })
 Vue.use(ElementUI,{size:'small',zIndex:3000})
+
 new Vue({
   render: h => h(App),
+  store
 }).$mount('#app')

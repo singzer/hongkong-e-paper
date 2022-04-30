@@ -57,6 +57,10 @@ export default {
             type: Number,
             default:12
         },
+        tableStoreId:{
+            type: Number,
+            default:12
+        }
         
     },
     data(){
@@ -81,10 +85,24 @@ export default {
             labelPosition: "right",
         }
     },
+    computed: {
+        tableStore(){
+            return this.$store.state.tableData[this.tableStoreId]
+        }
+    },
     methods:{
         // 预览
         preview(){
-            let dataJson = JSON.stringify(this.form)
+            let date = new Date()
+            let dataJson = JSON.stringify({
+                name: this.form.name,
+                meetAdr: this.form.meetAdr,
+                describe: this.form.describe,
+                meetName: this.form.meetName,
+                state: this.form.state,
+                startTime: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+                endTime: date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds(),
+            })
             let data = Base64.encode(dataJson)
             // this.$refs.ttt.imgURL = `/api/form/preview?data=${data}`
             console.log(data)
@@ -94,7 +112,15 @@ export default {
         // 提交表单给paperPaper组件
         subForm(){
             
-            let dataJson = JSON.stringify({temp_name:"1212",temp_data:this.form})
+            let dataJson = JSON.stringify({temp_name:"1212",temp_data:{
+                name: this.form.name,
+                meetAdr: this.form.meetAdr,
+                describe: this.form.describe,
+                meetName: this.form.meetName,
+                state: this.form.state,
+                startTime: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
+                endTime: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds(),
+            }})
             console.log(dataJson)
             this.$ajax({
                 method: "post",
@@ -116,11 +142,10 @@ export default {
             console.log(value)
         }
     },
-
-    beforeMount(){
-        let id = this.formID
-        console.log(id)
+    mounted(){
+        console.log("========")
     }
+
 }
 </script>
 

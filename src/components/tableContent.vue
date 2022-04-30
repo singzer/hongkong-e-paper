@@ -17,7 +17,7 @@
       <el-table-column prop="lastTime" label="最后上线时间"></el-table-column>
       <el-table-column prop="operate" label="操作" width="300">
         <template slot-scope="scope">
-          <el-button type="text" :id="scope.index" @click="openFormScreen(scope.$index)"
+          <el-button type="text" :id="scope.index" @click="openFormScreen(scope.$index)" 
             >编辑设备</el-button
           >&nbsp;&nbsp;&nbsp;&nbsp;
           <el-button type="text">下发内容</el-button>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -26,41 +26,37 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog title="编辑设备" :visible.sync="dialogFormVisible" id="formcss">
+    <el-dialog title="编辑设备" :visible.sync="dialogFormVisible" id="formcss" v-if="dialogFormVisible">
       <el-row>
         <el-col :span="12">
-          <form-paper :templateScreen="templateScreen" :formID="formID" @formMes="imgURLMes"></form-paper>
+          <form-paper :templateScreen="templateScreen" :formID="formID" @formMes="imgURLMes" :tableStoreId="tableStoreId" ></form-paper>
         </el-col>
         <el-col :span="12">
-          <paper-show v-loading="fullscreenLoading" :ePaperTemplate="ePaperTemplate" :imgURL="imgURL"></paper-show>
+          <paper-show v-loading="fullscreenLoading" :ePaperTemplate="ePaperTemplate" :imgURL="imgURL" :paperID="paperID"></paper-show>
         </el-col>
       </el-row>
     </el-dialog>
 
-    <el-dialog title="编辑设备" :visible.sync="dialogContentVisible" id="formcss">
-      <el-row>
-        <el-col :span="12">
-          <form-paper :templateScreen="templateScreen" :formID="formID"></form-paper>
-        </el-col>
-        <el-col :span="12">
-          <paper-show v-loading="fullscreenLoading"></paper-show>
-        </el-col>
-      </el-row>
+    <el-dialog title="编辑设备" :visible.sync="dialogContentVisible" class="ttt">
+      <content-show></content-show>
     </el-dialog>
   </div>
 </template>
 
 <script>
+
 export default {
   components: {
     "form-paper": () => import('./formPaper.vue'),
-    "paper-show": () => import('./paperShow.vue')
+    "paper-show": () => import('./paperShow.vue'),
+    "content-show":() => import('./contentShow.vue')
   },
   data() {
     return {
       tableData: [
       ],
       formID:12,
+      tableStoreId:12,
       fullscreenLoading: false,
       // 隐藏框
       dialogTableVisible: false,
@@ -84,6 +80,8 @@ export default {
       },
       formPaperData:"",
       imgURL:"",
+      paperID: 0,
+      // paperShowKey:0,
     };
   },
   methods: {
@@ -99,6 +97,8 @@ export default {
     openFormScreen(e) {
         this.ePaperTemplate.width = this.tableData[e].width;
         this.ePaperTemplate.height = this.tableData[e].height;
+        this.paperShowKey = Math.random();
+        console.log(this.tableStoreId);
         switch(this.ePaperTemplate.width){
           case 640:
             this.ePaperTemplate.temp_data.title = "测试会议";
@@ -130,7 +130,9 @@ export default {
         this.formID = this.tableData[e].id
         this.fullscreenLoading = true;
         this.dialogFormVisible = true;
-        
+        this.tableStoreId = e;
+        this.imgURL = "";
+        this.paperID = e;
       },
 
     // 展示内容页面
@@ -141,10 +143,14 @@ export default {
 
     
   },
+  computed:{
+    
+  },
   mounted() {
     this.$ajax.get("/api/epd/devices").then(res => {
-      console.log(res.data)
-
+      // console.log(res.data)
+      this.$store.commit("setTableData", res.data);
+      console.log(this.$store.state.tableData)
       for(let i = 0; i < res.data.length; i++ ){
         let tableData = {
         model: "",
@@ -176,14 +182,6 @@ export default {
         tableData.height = res.data[i].epd_height
         tableData.temp_name = res.data[i].temp_name
         tableData.model = res.data[i].epd_ver.length > 0 ? res.data[i].epd_ver + "-" + res.data[i].epd_width + "*" + res.data[i].epd_height : res.data[i].epd_width + "*" + res.data[i].epd_height
-        // switch (res.data[i].epd_width){
-        //   case 640:
-        //     tableData.model = "7.5寸黑白红";
-        //     break;
-        //   case 400:
-        //     tableData.model = "4.2寸黑白红"
-        //     break;
-        // }
         if(res.data[i].battery_is_charging == true){
           tableData.state = "正常"
         }else{
@@ -224,6 +222,8 @@ span{
     width: 1000px;
     height: 600px;
   }
+
+
 
 /* @media (min-width: 1200px) and (max-width: 2000px){
   .el-dialog{
