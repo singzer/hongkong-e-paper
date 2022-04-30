@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :label-position="labelPosition" :model="form" :rules="rules">
+    <el-form :label-position="labelPosition" :model="form" :rules="rules" ref="formData">
         <el-form-item label="模板画面">
         <el-select :placeholder="templateScreen" :disabled="true">
             <el-option label="区域一" value="shanghai"></el-option>
@@ -17,24 +17,24 @@
             <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option>
         </el-select>
         </el-form-item>
-        <el-form-item label="会议场所">
-        <el-input v-model="form.meetAdr" minlength="4" maxlength="8" show-word-limit></el-input>
+        <el-form-item label="会议场所" prop="meetAdr">
+        <el-input v-model="form.meetAdr" minlength="4" maxlength="8" show-word-limit autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="姓名">
+        <el-form-item label="姓名" prop="name">
         <el-input v-model="form.name" minlength="2" maxlength="4" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="职称或描述">
-        <el-input v-model="form.describe"></el-input>
+        <el-form-item label="职称或描述" prop="describe">
+        <el-input v-model="form.describe" minlength="2" maxlength="4" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="会议名称">
+        <el-form-item label="会议名称" prop="meetName">
         <el-input v-model="form.meetName"></el-input>
         </el-form-item>
-        <el-form-item label="状态" id="1">
+        <el-form-item label="状态" id="1" prop="state">
         <el-input v-model="form.state"></el-input>
         </el-form-item>
         <el-form-item>
         <el-button @click="preview" >预 览</el-button>
-        <el-button type="primary" @click="subForm" :plain="true"
+        <el-button type="primary" @click="subForm('formData')" :plain="true"
             >上 传</el-button
         >
     </el-form-item>
@@ -53,10 +53,12 @@ export default {
             type: String,
             default: '请选择活动区域'
         },
+        // 模板id
         formID:{
             type: Number,
             default:12
         },
+        // 原内容索引
         tableStoreId:{
             type: Number,
             default:12
@@ -64,6 +66,51 @@ export default {
         
     },
     data(){
+        let validatekMeetAdr = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入会议场所'));
+            } else if(value.length < 4 || value.length > 8){
+                callback(new Error('会议场所长度为4-8位'));
+            } else {
+                callback();
+            }
+        };
+
+        let validateName = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入姓名'));
+            } else if(value.length < 2 || value.length > 4){
+                callback(new Error('姓名长度为2-4位'));
+            } else {
+                callback();
+            }
+        };
+
+        let validateDescribe = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入职称或描述'));
+            } else {
+                callback();
+            }
+        };
+
+        let validateMeetName = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入会议名称'));
+            } else if(value.length < 2 || value.length > 4){
+                callback(new Error('会议名称长度为2-4位'));
+            } else {
+                callback();
+            }
+        };
+
+        let validateState = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入状态'));
+            } else {
+                callback();
+            }
+        };
       
         return {
             form: {
@@ -79,7 +126,22 @@ export default {
                 checkActiveName: [
                     // { validator: validateForm, trigger: 'blur' },
                     { max:8, message: '不能超过8个字符',  trigger: 'blur'}
-                ]
+                ],
+                meetAdr: [
+                    { validator: validatekMeetAdr, trigger: 'blur' }
+                ],
+                name: [
+                    { validator: validateName, trigger: 'blur' }
+                ],
+                describe: [
+                    { validator: validateDescribe, trigger: 'blur' }
+                ],
+                meetName: [
+                    { validator: validateMeetName, trigger: 'blur' }
+                ],
+                state: [
+                    { validator: validateState, trigger: 'blur' }
+                ],
             },
             formLabelWidth: "120px",
             labelPosition: "right",
@@ -110,9 +172,24 @@ export default {
         },
 
         // 提交表单给paperPaper组件
-        subForm(){
-            
-            let dataJson = JSON.stringify({temp_name:"1212",temp_data:{
+        subForm(value){
+            let check = false;
+            this.$refs[value].validate((valid) => {
+                if (!valid) {
+                    // this.$emit('formMes',this.form)
+                    console.log('error submit!!');
+                    return false;
+                } else {
+                    check = true;
+                    return true;
+                }
+            });
+            if(!check){
+                this.$message('请填写内容')
+                return ;
+            }
+
+            let temp_data = JSON.stringify({
                 name: this.form.name,
                 meetAdr: this.form.meetAdr,
                 describe: this.form.describe,
@@ -120,8 +197,9 @@ export default {
                 state: this.form.state,
                 startTime: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
                 endTime: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds(),
-            }})
-            console.log(dataJson)
+            })
+            let temp_name = this.$store.state.tableData[this.tableStoreId].name
+            let dataJson = {temp_name:temp_name,temp_data:Base64.encode(temp_data)}
             this.$ajax({
                 method: "post",
                 url: `/api/epd/device/${this.formID}/setTemp`,
@@ -150,5 +228,7 @@ export default {
 </script>
 
 <style>
-
+.el-form-item__error{
+    margin-left: 80px;
+}
 </style>
