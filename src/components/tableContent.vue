@@ -29,10 +29,11 @@
     <el-dialog title="编辑设备" :visible.sync="dialogFormVisible" id="formcss" v-if="dialogFormVisible">
       <el-row>
         <el-col :span="12">
-          <form-paper :templateScreen="templateScreen" :formID="formID" @formMes="imgURLMes" :tableStoreId="tableStoreId" ></form-paper>
+          <div @click="test">12121212</div>
+          <form-paper :templateScreen="templateScreen" :formID="formID" @formMes="imgURLMes" :tableStoreId="tableStoreId"></form-paper>
         </el-col>
         <el-col :span="12">
-          <paper-show v-loading="fullscreenLoading" :ePaperTemplate="ePaperTemplate" :imgURL="imgURL" :paperID="paperID"></paper-show>
+          <paper-show v-loading.lock="fullscreenLoading" :ePaperTemplate="ePaperTemplate" :imgURL="imgURL" :paperID="paperID" id="test"></paper-show>
         </el-col>
       </el-row>
     </el-dialog>
@@ -85,15 +86,17 @@ export default {
     };
   },
   methods: {
-    test(e) {
-      console.log(this.tableData[e].model);
-      this.templateScreen = this.tableData[e].model;
-      this.dialogFormVisible = true;
+    test() {
+      // this.templateScreen = this.tableData[e].model;
+      // this.dialogFormVisible = true;
+      
     },
     imgURLMes(e){
       this.imgURL = e;
-      console.log("imgURLMes");
-      console.log(this.imgURL);
+    },
+    previews(e){
+      console.log(e);
+      this.fullscreenLoading = e
     },
     // 展示编辑页面
     openFormScreen(e) {
@@ -133,7 +136,7 @@ export default {
         this.fullscreenLoading = true;
         this.dialogFormVisible = true;
         this.tableStoreId = e;
-        this.imgURL = "";
+        this.imgURL = {};
         this.paperID = e;
       },
 

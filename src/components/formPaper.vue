@@ -9,10 +9,10 @@
         </el-form-item>
         <el-form-item label="内容模板">
         <el-select v-model="form.templateContent"  placeholder="请选择活动区域" @change="selectChange">
-            <el-option label="会议桌签" value="hd." @click="selectChange"></el-option>
+            <el-option label="会议桌签" value="hd." ></el-option>
             <!-- <el-option label="会议桌签2" value="会议桌签2"></el-option> -->
-            <el-option label="图书馆引导牌red" value="letter.red" @click="selectChange"></el-option>
-            <el-option label="图书馆引导牌black" value="letter.black" @click="selectChange"></el-option>
+            <el-option label="图书馆引导牌red" value="letter.red" ></el-option>
+            <el-option label="图书馆引导牌black" value="letter.black" ></el-option>
             <!-- <el-option label="图书馆引导牌3" value="图书馆引导牌3"></el-option> -->
             <!-- <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option> -->
         </el-select>
@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import {Base64} from 'js-base64'
 export default {
     props: {
         templateScreen: {
@@ -156,6 +155,7 @@ export default {
                 meetName: "会议名称",
                 state: "状态",
                 meetAdr: "会议场所",
+                text: "文本内容",
             },
         }
     },
@@ -167,6 +167,13 @@ export default {
     methods:{
         // 预览
         preview(){
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                // spinner: 'el-icon-loading',
+                target: '.box-card',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
             if (this.form.templateContent.split('.')[0] == "hd"){
             let date = new Date()
             let dataJson = JSON.stringify({
@@ -178,7 +185,7 @@ export default {
                 startTime: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
                 endTime: date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds(),
             })
-            let data = Base64.encode(dataJson)
+            let data = encodeURIComponent(dataJson)
             let tempType = this.form.templateContent.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +this.form.templateContent.split('.')[1]
             // this.$refs.ttt.imgURL = `/api/form/preview?data=${data}`
             console.log(tempType)
@@ -189,19 +196,25 @@ export default {
                 tempType: tempType,
                 tempData: data,
             })
+            setTimeout(() => {
+                loading.close();
+            }, 3000);
             return;
             }else{
                 let dataJson = JSON.stringify({
                     text: this.form.text,
                 })
                 let tempType = this.form.templateContent.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +this.form.templateContent.split('.')[1]
-                let data = Base64.encode(dataJson)
+                let data = encodeURIComponent(dataJson)
                 console.log(tempType)
                 console.log(data)
                 this.$emit('formMes',{
                     tempType: tempType,
                     tempData: data,
                 })
+                setTimeout(() => {
+                    loading.close();
+                }, 2000);
             }
         },
 
@@ -233,7 +246,7 @@ export default {
                 endTime: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds(),
             })
             let temp_name = this.$store.state.tableData[this.tableStoreId].name
-            let dataJson = {temp_name:temp_name,temp_data:Base64.encode(temp_data)}
+            let dataJson = {temp_name:temp_name,temp_data:encodeURIComponent(temp_data)}
             this.$ajax({
                 method: "post",
                 url: `/api/epd/device/${this.formID}/setTemp`,
@@ -251,6 +264,13 @@ export default {
 
         // selectChange
         selectChange(value){
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                // spinner: 'el-icon-loading',
+                target: '.box-card',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
             if (value.split('.')[0] == "hd"){
                     this.isShow = true;
                     let date = new Date();
@@ -264,11 +284,14 @@ export default {
                         endTime: date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds(),
                     })
                     value = value.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +value.split('.')[1]
-                    let temp_data = Base64.encode(dataJson)
+                    let temp_data = encodeURIComponent(dataJson)
                     this.$emit('formMes',{
                     tempType: value,
                     tempData: temp_data,
                 })
+                setTimeout(() => {
+                    loading.close();
+                }, 3000);
                 return;
             }
             if (value.split('.')[0] == "letter"){
@@ -276,12 +299,15 @@ export default {
                 let dataJson = JSON.stringify({
                     text: this.initData.text,
                 });
-                let data = Base64.encode(dataJson)
+                let data = encodeURIComponent(dataJson)
                 value = value.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +value.split('.')[1]
                 this.$emit('formMes',{
                     tempType: value,
                     tempData: data,
                 })
+                setTimeout(() => {
+                    loading.close();
+                }, 2000);
                 return;
             }
         },

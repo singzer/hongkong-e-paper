@@ -59,12 +59,26 @@ export default {
     computed:{
         // 图片路径
         imgURLFormat(){
-          // console.log(this.ePaperTemplate)
+            console.log("===",this.imgURL)
             let width = this.ePaperTemplate.width;
             let height = this.ePaperTemplate.height;
-            if(this.imgURL == ""){
-              return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${this.imgURL.tempType}&data=${this.imgURL.tempData}}`;
+            if(this.imgURL.tempData == null){
+              console.log("===init===")
+              let initData =  {
+                meetAdr: "会议场所", // 会议场所
+                name: "姓名", // 姓名
+                describe: "职称或描述", // 职称或描述
+                meetName: "会议名称", // 会议名称
+                state: "状态", // 状态
+                startTime: "2001-01-01", // 开始时间
+                endTime: "18:00-20:00", // 结束时间
+                }
+              let initType = "hd640384";
+              initData = encodeURIComponent(JSON.stringify(initData));
+              return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${initType}&data=${initData}`;
             }
+            console.log("===after===")
+            console.log(this.imgURL.tempData)
             return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${this.imgURL.tempType}&data=${this.imgURL.tempData}`;
         }
     },
