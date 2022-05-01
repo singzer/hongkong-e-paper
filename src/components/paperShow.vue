@@ -32,8 +32,13 @@ export default {
           }
         },
       imgURL:{
-        type:String,
-        default:"eyJuYW1lIjoiMTMxMyIsIm1lZXRBZHIiOiIxMzEzIiwiZGVzY3JpYmUiOiIxMzExMzIiLCJtZWV0TmFtZSI6IjEzMjEzIiwic3RhdGUiOiIxMzIxMyIsInN0YXJ0VGltZSI6IjIwMjItNC0zMCIsImVuZFRpbWUiOiIwOjU3OjM4In0="
+        type:Object,
+        default:function(){
+          return {
+            // tempType:"hd640384",
+            // tempData:"e25hbWUiOiLmtYvor5XkvJrorq4iLCJtZWV0QWRyIjoi5Lya6K6u5Zyw54K5IiwiZGVzY3JpYmUiOiLkvJrorq7mj4/ov7AiLCJtZWV0TmFtZSI6IuWQjeWtlyIsInN0YXRlIjoi5Lya6K6u5LitIiwic3RhcnRUaW1lIjoiMjAyMi01LTEiLCJlbmRUaW1lIjoiMTY6MzY6NTkifQ==",
+          }
+        }
       },
       imgKey:{
         type:Number,
@@ -58,9 +63,9 @@ export default {
             let width = this.ePaperTemplate.width;
             let height = this.ePaperTemplate.height;
             if(this.imgURL == ""){
-              return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&data=eyJuYW1lIjoiMTMxMyIsIm1lZXRBZHIiOiIxMzEzIiwiZGVzY3JpYmUiOiIxMzExMzIiLCJtZWV0TmFtZSI6IjEzMjEzIiwic3RhdGUiOiIxMzIxMyIsInN0YXJ0VGltZSI6IjIwMjItNC0zMCIsImVuZFRpbWUiOiIwOjU3OjM4In0=`;
+              return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${this.imgURL.tempType}&data=${this.imgURL.tempData}}`;
             }
-            return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&data=${this.imgURL}`;
+            return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${this.imgURL.tempType}&data=${this.imgURL.tempData}`;
         }
     },
     mounted(){

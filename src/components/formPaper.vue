@@ -9,28 +9,31 @@
         </el-form-item>
         <el-form-item label="内容模板">
         <el-select v-model="form.templateContent"  placeholder="请选择活动区域" @change="selectChange">
-            <el-option label="会议桌签1" value="会议桌签1"></el-option>
-            <el-option label="会议桌签2" value="会议桌签2"></el-option>
-            <el-option label="图书馆引导牌1" value="图书馆引导牌1"></el-option>
-            <el-option label="图书馆引导牌2" value="图书馆引导牌2"></el-option>
-            <el-option label="图书馆引导牌3" value="图书馆引导牌3"></el-option>
-            <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option>
+            <el-option label="会议桌签" value="hd." @click="selectChange"></el-option>
+            <!-- <el-option label="会议桌签2" value="会议桌签2"></el-option> -->
+            <el-option label="图书馆引导牌red" value="letter.red" @click="selectChange"></el-option>
+            <el-option label="图书馆引导牌black" value="letter.black" @click="selectChange"></el-option>
+            <!-- <el-option label="图书馆引导牌3" value="图书馆引导牌3"></el-option> -->
+            <!-- <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option> -->
         </el-select>
         </el-form-item>
-        <el-form-item label="会议场所" prop="meetAdr">
+        <el-form-item label="会议场所" prop="meetAdr" v-if="isShow">
         <el-input v-model="form.meetAdr" minlength="4" maxlength="8" show-word-limit autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
+        <el-form-item label="姓名" prop="name" v-if="isShow">
         <el-input v-model="form.name" minlength="2" maxlength="4" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="职称或描述" prop="describe">
+        <el-form-item label="职称或描述" prop="describe" v-if="isShow">
         <el-input v-model="form.describe" minlength="2" maxlength="4" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="会议名称" prop="meetName">
+        <el-form-item label="会议名称" prop="meetName" v-if="isShow">
         <el-input v-model="form.meetName"></el-input>
         </el-form-item>
-        <el-form-item label="状态" id="1" prop="state">
+        <el-form-item label="状态" id="1" prop="state" v-if="isShow">
         <el-input v-model="form.state"></el-input>
+        </el-form-item>
+        <el-form-item label="文本内容" id="1" prop="text" v-if="!isShow">
+        <el-input v-model="form.text"></el-input>
         </el-form-item>
         <el-form-item>
         <el-button @click="preview" >预 览</el-button>
@@ -121,6 +124,7 @@ export default {
                 describe: "", // 职称或描述
                 meetName: "", // 会议名称
                 state: "", // 状态
+                text: "", // 文本内容
             },
             rules:{
                 checkActiveName: [
@@ -145,6 +149,14 @@ export default {
             },
             formLabelWidth: "120px",
             labelPosition: "right",
+            isShow: true,
+            initData: {
+                name: "姓名",
+                describe: "职称或描述",
+                meetName: "会议名称",
+                state: "状态",
+                meetAdr: "会议场所",
+            },
         }
     },
     computed: {
@@ -155,6 +167,7 @@ export default {
     methods:{
         // 预览
         preview(){
+            if (this.form.templateContent.split('.')[0] == "hd"){
             let date = new Date()
             let dataJson = JSON.stringify({
                 name: this.form.name,
@@ -166,9 +179,30 @@ export default {
                 endTime: date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds(),
             })
             let data = Base64.encode(dataJson)
+            let tempType = this.form.templateContent.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +this.form.templateContent.split('.')[1]
             // this.$refs.ttt.imgURL = `/api/form/preview?data=${data}`
+            console.log(tempType)
             console.log(data)
-            this.$emit('formMes',data)
+            console.log("temp_data",data)
+
+            this.$emit('formMes',{
+                tempType: tempType,
+                tempData: data,
+            })
+            return;
+            }else{
+                let dataJson = JSON.stringify({
+                    text: this.form.text,
+                })
+                let tempType = this.form.templateContent.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +this.form.templateContent.split('.')[1]
+                let data = Base64.encode(dataJson)
+                console.log(tempType)
+                console.log(data)
+                this.$emit('formMes',{
+                    tempType: tempType,
+                    tempData: data,
+                })
+            }
         },
 
         // 提交表单给paperPaper组件
@@ -217,8 +251,41 @@ export default {
 
         // selectChange
         selectChange(value){
-            console.log(value)
-        }
+            if (value.split('.')[0] == "hd"){
+                    this.isShow = true;
+                    let date = new Date();
+                    let dataJson = JSON.stringify({
+                        name: this.initData.name,
+                        meetAdr: this.initData.meetAdr,
+                        describe: this.initData.describe,
+                        meetName: this.initData.meetName,
+                        state: this.initData.state,
+                        startTime: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+                        endTime: date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds(),
+                    })
+                    value = value.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +value.split('.')[1]
+                    let temp_data = Base64.encode(dataJson)
+                    this.$emit('formMes',{
+                    tempType: value,
+                    tempData: temp_data,
+                })
+                return;
+            }
+            if (value.split('.')[0] == "letter"){
+                this.isShow = false;
+                let dataJson = JSON.stringify({
+                    text: this.initData.text,
+                });
+                let data = Base64.encode(dataJson)
+                value = value.split('.')[0] + this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" +value.split('.')[1]
+                this.$emit('formMes',{
+                    tempType: value,
+                    tempData: data,
+                })
+                return;
+            }
+        },
+
     },
     mounted(){
         console.log("========")

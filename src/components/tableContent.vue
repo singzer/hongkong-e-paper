@@ -79,7 +79,7 @@ export default {
         temp_name:'名字',
       },
       formPaperData:"",
-      imgURL:"",
+      imgURL:{},
       paperID: 0,
       // paperShowKey:0,
     };
@@ -92,6 +92,8 @@ export default {
     },
     imgURLMes(e){
       this.imgURL = e;
+      console.log("imgURLMes");
+      console.log(this.imgURL);
     },
     // 展示编辑页面
     openFormScreen(e) {
