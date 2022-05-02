@@ -51,12 +51,7 @@ let store = new Vuex.Store({
       state.tableData = data
     },
     setFormData (state, data) {
-      if (state.formData[data.index] == undefined) {
-        state.formData[data.index] = new Array()
-        state.formData[data.index].push(data.data)
-      }else{
-        state.formData[data.index].push(data.data)
-      }
+        state.formData[data.index] = data.data
     }
   }
 })
