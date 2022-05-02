@@ -38,8 +38,8 @@
       </el-row>
     </el-dialog>
 
-    <el-dialog title="编辑设备" :visible.sync="dialogContentVisible" class="ttt" prop="test">
-      <content-show prop="test"></content-show>
+    <el-dialog title="编辑设备" :visible.sync="dialogContentVisible" class="ttt">
+      <content-show></content-show>
     </el-dialog>
   </div>
 </template>
