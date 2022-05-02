@@ -2,9 +2,9 @@
   <div>
     <el-form :label-position="labelPosition" :model="form" :rules="rules" ref="formData">
         <el-form-item label="模板画面">
-        <el-select :placeholder="templateScreen" :disabled="true">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+        <el-select :placeholder="templateScreen" :disabled="true" v-model="form.templateScreen">
+            <!-- <el-option label="区域一" value="shanghai"></el-option> -->
+            <!-- <el-option label="区域二" value="beijing"></el-option> -->
         </el-select>
         </el-form-item>
         <el-form-item label="内容模板">
