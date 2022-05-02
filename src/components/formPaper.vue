@@ -244,7 +244,7 @@ export default {
                 startTime: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
                 endTime: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds(),
             })
-            let temp_name = this.$store.state.tableData[this.tableStoreId].name
+            let temp_name ="hd"+ this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" + this.form.templateContent.split('.')[1]
             let dataJson = {temp_name:temp_name,temp_data:encodeURIComponent(temp_data)}
             this.$ajax({
                 method: "post",
@@ -257,7 +257,17 @@ export default {
                     this.$message('上传成功')
                 }else{
                     this.$message('上传失败')
+                    return ;
                 }
+            })
+            // vux 设置预备要上传的内容
+            console.log("上传的内容",this.form)
+            this.$store.commit('setFormData',{
+                        index: this.$store.state.tableData[this.tableStoreId].ID,
+                        data:{
+                            temp_data: temp_data,
+                            temp_name: temp_name,
+                        }
             })
         },
 

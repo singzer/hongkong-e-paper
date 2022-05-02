@@ -43,11 +43,20 @@ axios.interceptors.response.use(function (response) {
 let store = new Vuex.Store({
   state: {
     tableData: [],
+    formData: new Array(),
   },
   mutations: {
     setTableData (state, data) {
       console.log(data)
       state.tableData = data
+    },
+    setFormData (state, data) {
+      if (state.formData[data.index] == undefined) {
+        state.formData[data.index] = new Array()
+        state.formData[data.index].push(data.data)
+      }else{
+        state.formData[data.index].push(data.data)
+      }
     }
   }
 })

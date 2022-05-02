@@ -8,10 +8,9 @@
     <div class="interval"></div>
     <table-content></table-content>
     <el-row>
-      <el-button type="primary" id="btn">批量下发</el-button>
+      <el-button type="primary" id="btn" @click="subs">批量下发</el-button>
     </el-row>
 
-    <!-- <div class="interval" id="bottom"></div> -->
   </div>
 </template>
 
@@ -50,6 +49,30 @@ export default {
       // console.log(e.target.id);
       console.log(e)
       this.dialogFormVisible = true;
+    },
+    subs(){
+      console.log("aaadada",this.$store.state.formData[1])
+      this.$store.state.formData.forEach((element,index) => {
+        console.log("element",element)
+        console.log("index",index)
+        this.$ajax({
+                method: "post",
+                url: `/api/epd/device/${index}/setTemp`,
+                data: {
+                  temp_data: element[index].temp_data,
+                  temp_name: element[index].temp_name,
+                },
+                dataType:"json",
+            }).then(res=>{
+                console.log(res)
+                if(res.code == 200){
+                    this.$message('上传成功')
+                }else{
+                    this.$message('上传失败')
+                    return ;
+                }
+            })
+      });
     }
   },
   mounted() {

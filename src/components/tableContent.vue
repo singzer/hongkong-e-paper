@@ -20,7 +20,7 @@
           <el-button type="text" :id="scope.index" @click="openFormScreen(scope.$index)" 
             >编辑设备</el-button
           >&nbsp;&nbsp;&nbsp;&nbsp;
-          <el-button type="text">下发内容</el-button>&nbsp;&nbsp;&nbsp;&nbsp;
+          <el-button type="text" @click="subContent(scope.$index)">下发内容</el-button>&nbsp;&nbsp;&nbsp;&nbsp;
           <el-button type="text" @click="openContentScreen(scope.$index)">查看内容</el-button>
         </template>
       </el-table-column>
@@ -146,6 +146,23 @@ export default {
       console.log(e)
     },
 
+    subContent(e){
+      let id = this.$store.state.tableData[e].ID;
+      let formDatas = this.$store.state.formData[id];
+      this.$ajax.post({
+                method: "post",
+                url: `/api/epd/device/${id}/setTemp`,
+                data: formDatas,
+                dataType:"json",
+            }).then(res => {
+                console.log(res);
+            }).catch(err => {
+                console.log(err);
+      });
+      
+    },
+
+    
     
   },
   computed:{
