@@ -1,7 +1,6 @@
 <template>
   <div>
     <el-card class="box-card">
-      <!-- src="http://sm.singzer.cn/epd/img.bmp" -->
           <img id="e-paper" :src="imgURLFormat"  :key="imgKey"/>
     </el-card>
   </div>
@@ -75,11 +74,11 @@ export default {
                 }
               let initType = "hd640384";
               initData = encodeURIComponent(JSON.stringify(initData));
-              return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${initType}&data=${initData}`;
+              return `/api/epd/img.bmp?width=${width}&height=${height}&type=${initType}&data=${initData}`;
             }
             console.log("===after===")
             console.log(this.imgURL.tempData)
-            return `http://sm.singzer.cn/epd/img.bmp?width=${width}&height=${height}&type=${this.imgURL.tempType}&data=${this.imgURL.tempData}`;
+            return `/api/epd/img.bmp?width=${width}&height=${height}&type=${this.imgURL.tempType}&data=${this.imgURL.tempData}`;
         }
     },
     mounted(){
