@@ -38,7 +38,6 @@
     >
       <el-row>
         <el-col :span="12">
-          <div @click="test">12121212</div>
           <form-paper
             :templateScreen="templateScreen"
             :formID="formID"
@@ -121,15 +120,13 @@ export default {
     imgURLMes(e) {
       this.imgURL = e;
     },
-    previews(e) {
-      console.log(e);
-      this.fullscreenLoading = e;
-    },
+
     // 展示编辑页面
     openFormScreen(e) {
       this.ePaperTemplate.width = this.tableData[e].width;
       this.ePaperTemplate.height = this.tableData[e].height;
       this.paperShowKey = Math.random();
+
       console.log(this.tableStoreId);
       switch (this.ePaperTemplate.width) {
         case 640:
@@ -170,10 +167,14 @@ export default {
     // 展示内容页面
     openContentScreen(e) {
       this.dialogContentVisible = true;
-      let id = this.$store.state.tableData[e].ID;
+      // let id = this.$store.state.tableData[e].ID;
+      let temp_name = this.$store.state.tableData[e].temp_name;
+      let temp_data = this.$store.state.tableData[e].temp_data;
+      let width = this.$store.state.tableData[e].epd_width;
+      let height = this.$store.state.tableData[e].epd_height;
       this.contentParams = {
         index: e,
-        contentURL: `/api/epd/device/${id}/getTemp`,
+        contentURL: `/api/epd/img.bmp?width=${width}&height=${height}&type=${temp_name}&data=${temp_data}`,
       };
       console.log(this.contentParams);
     },

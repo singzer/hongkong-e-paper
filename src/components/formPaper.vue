@@ -50,16 +50,19 @@
       <el-form-item label="职称或描述" prop="describe" v-if="isShow">
         <el-input
           v-model="form.describe"
-          minlength="2"
-          maxlength="4"
+          maxlength="21"
           show-word-limit
         ></el-input>
       </el-form-item>
       <el-form-item label="会议名称" prop="meetName" v-if="isShow">
         <el-input v-model="form.meetName"></el-input>
       </el-form-item>
-      <el-form-item label="状态" id="1" prop="state" v-if="isShow">
-        <el-input v-model="form.state"></el-input>
+      <el-form-item label="请选择状态" id="1" prop="state" v-if="isShow">
+        <!-- <el-input v-model="form.state"></el-input> -->
+        <el-select v-model="form.state">
+          <el-option label="已开始" value="已开始"></el-option>
+          <el-option label="已结束" value="已结束"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="文本内容" id="1" prop="text" v-if="!isShow">
         <el-input v-model="form.text"></el-input>
@@ -124,15 +127,21 @@ export default {
     let validateMeetName = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入会议名称"));
-      } else if (value.length < 2 || value.length > 4) {
-        callback(new Error("会议名称长度为2-4位"));
       } else {
         callback();
       }
+
+      //   if (value === "") {
+      //     callback(new Error("请输入会议名称"));
+      //   } else if (value.length < 2 || value.length > 4) {
+      //     callback(new Error("会议名称长度为2-4位"));
+      //   } else {
+      //     callback();
+      //   }
     };
 
     let validateState = (rule, value, callback) => {
-      if (value === "") {
+      if (value == "") {
         callback(new Error("请输入状态"));
       } else {
         callback();
@@ -141,14 +150,14 @@ export default {
 
     return {
       form: {
-        templateScreen: "", // 屏幕型号
+        templateScreen: "屏幕型号", // 屏幕型号
         templateContent: "", // 内容模板
         meetAdr: "", // 会议场所
         name: "", // 姓名
         describe: "", // 职称或描述
         meetName: "", // 会议名称
         state: "", // 状态
-        text: "", // 文本内容
+        text: "文本内容", // 文本内容
       },
       rules: {
         checkActiveName: [
@@ -172,6 +181,8 @@ export default {
         meetAdr: "会议场所",
         text: "文本内容",
       },
+      previewLock: 0,
+      cacheData: {},
     };
   },
   computed: {
@@ -182,14 +193,14 @@ export default {
   methods: {
     // 预览
     preview() {
-      const loading = this.$loading({
-        lock: true,
-        text: "Loading",
-        // spinner: 'el-icon-loading',
-        target: ".box-card",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
+      let e_paperDom = document.getElementById("e-paper");
       if (this.form.templateContent.split(".")[0] == "hd") {
+        if (21 < this.form.describe.length) {
+          this.form.describe = this.form.describe.substring(0, 19) + "...";
+        }
+        if (8 < this.form.meetName.length) {
+          this.form.meetName = this.form.meetName.substring(0, 7) + "...";
+        }
         let date = new Date();
         let dataJson = JSON.stringify({
           name: this.form.name,
@@ -204,7 +215,13 @@ export default {
             "-" +
             date.getDate(),
           endTime:
-            date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(),
+            date.getHours() +
+            ":" +
+            date.getMinutes() +
+            "-" +
+            (date.getHours() + 2) +
+            ":" +
+            date.getMinutes(),
         });
         let data = encodeURIComponent(dataJson);
         let tempType =
@@ -214,14 +231,27 @@ export default {
           this.$store.state.tableData[this.tableStoreId].epd_height +
           "" +
           this.form.templateContent.split(".")[1];
-
+        if (
+          e_paperDom.getAttribute("src").split("&")[3].split("=")[1] == data
+        ) {
+          return;
+        }
+        console.log("进入预览");
+        const loading = this.$loading({
+          lock: true,
+          text: "Loading",
+          // spinner: 'el-icon-loading',
+          target: ".box-card",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
         this.$emit("formMes", {
           tempType: tempType,
           tempData: data,
+          random: Math.random(),
         });
-        setTimeout(() => {
+        e_paperDom.onload = () => {
           loading.close();
-        }, 3000);
+        };
         return;
       } else {
         let dataJson = JSON.stringify({
@@ -235,18 +265,32 @@ export default {
           "" +
           this.form.templateContent.split(".")[1];
         let data = encodeURIComponent(dataJson);
+        if (
+          e_paperDom.getAttribute("src").split("&")[3].split("=")[1] == data
+        ) {
+          return;
+        }
         this.$emit("formMes", {
           tempType: tempType,
           tempData: data,
         });
-        setTimeout(() => {
+        const loading = this.$loading({
+          lock: true,
+          text: "Loading",
+          // spinner: 'el-icon-loading',
+          target: ".box-card",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+        e_paperDom.onload = function () {
           loading.close();
-        }, 2000);
+        };
+        return;
       }
     },
 
     // 提交表单给paperPaper组件
     subForm(value) {
+      console.log(this.form);
       let check = false;
       this.$refs[value].validate((valid) => {
         if (!valid) {
@@ -255,6 +299,7 @@ export default {
           return false;
         } else {
           check = true;
+          console.log("success submit!!");
           return true;
         }
       });
@@ -350,45 +395,12 @@ export default {
           }
         });
       }
-
-      // let temp_data = JSON.stringify({
-      //     name: this.form.name,
-      //     meetAdr: this.form.meetAdr,
-      //     describe: this.form.describe,
-      //     meetName: this.form.meetName,
-      //     state: this.form.state,
-      //     startTime: new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate(),
-      //     endTime: new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds(),
-      // })
-
-      // let temp_name ="hd"+ this.$store.state.tableData[this.tableStoreId].epd_width + "" + this.$store.state.tableData[this.tableStoreId].epd_height + "" + this.form.templateContent.split('.')[1]
-      // let dataJson = {temp_name:temp_name,temp_data:encodeURIComponent(temp_data)}
-      // this.$ajax({
-      //     method: "post",
-      //     url: `/api/epd/device/${this.formID}/setTemp`,
-      //     data: dataJson,
-      //     dataType:"json",
-      // }).then(res=>{
-      //     console.log(res)
-      //     if(res.code == 200){
-      //         this.$message('上传成功')
-      //     }else{
-      //         this.$message('上传失败')
-      //         return ;
-      //     }
-      // })
-      // // vux 设置预备要上传的内容
-      // this.$store.commit('setFormData',{
-      //             index: this.$store.state.tableData[this.tableStoreId].ID,
-      //             data:{
-      //                 temp_data: temp_data,
-      //                 temp_name: temp_name,
-      //             }
-      // })
     },
 
     // selectChange
     selectChange(value) {
+      let e_paperDom = document.getElementById("e-paper");
+
       const loading = this.$loading({
         lock: true,
         text: "Loading",
@@ -426,9 +438,9 @@ export default {
           tempType: value,
           tempData: temp_data,
         });
-        setTimeout(() => {
+        e_paperDom.onload = () => {
           loading.close();
-        }, 3000);
+        };
         return;
       }
       if (value.split(".")[0] == "letter") {
@@ -448,15 +460,15 @@ export default {
           tempType: value,
           tempData: data,
         });
-        setTimeout(() => {
+        e_paperDom.onload = () => {
           loading.close();
-        }, 2000);
+        };
         return;
       }
     },
   },
   mounted() {
-    console.log("========");
+    this.form.templateScreen = this.templateScreen;
   },
 };
 </script>

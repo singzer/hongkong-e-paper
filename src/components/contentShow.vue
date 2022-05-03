@@ -7,6 +7,7 @@
         :height="height"
         :width="width"
         style="background-color: red"
+        ref="imgContent"
       />
     </el-card>
   </div>
@@ -31,19 +32,22 @@ export default {
       height: "",
     };
   },
-  methods: {
-    ttt() {
-      console.log(this.contentParams);
-    },
-  },
+  methods: {},
   mounted() {
     this.width =
       this.$store.state.tableData[this.contentParams.index].epd_width;
     this.height =
       this.$store.state.tableData[this.contentParams.index].epd_height;
-    // document.getElementById("contentCard").style.height =
-    //   this.height + 50 + "px";
-    // document.getElementById("contentCard").style.width = this.width + 50 + "px";
+
+    const loading = this.$loading({
+      lock: true,
+      text: "Loading",
+      background: "rgba(0, 0, 0, 0.7)",
+      target: "#contentCard",
+    });
+    this.$refs["imgContent"].onload = () => {
+      loading.close();
+    };
   },
 };
 </script>
