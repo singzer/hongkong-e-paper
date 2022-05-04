@@ -141,7 +141,7 @@ export default {
     };
 
     let validateState = (rule, value, callback) => {
-      if (value == "") {
+      if (value === "") {
         callback(new Error("请输入状态"));
       } else {
         callback();
@@ -202,26 +202,24 @@ export default {
           this.form.meetName = this.form.meetName.substring(0, 7) + "...";
         }
         let date = new Date();
+        let Month =
+          date.getMonth() + 1 < 10
+            ? "0" + (date.getMonth() + 1)
+            : date.getMonth() + 1;
+        let Day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        let Hour =
+          date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        let Minute =
+          date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+        let HourNext = Number(Hour) + 2 > 24 ? 24 : Hour + 2;
         let dataJson = JSON.stringify({
           name: this.form.name,
           meetAdr: this.form.meetAdr,
           describe: this.form.describe,
           meetName: this.form.meetName,
           state: this.form.state,
-          startTime:
-            date.getFullYear() +
-            "-" +
-            (date.getMonth() + 1) +
-            "-" +
-            date.getDate(),
-          endTime:
-            date.getHours() +
-            ":" +
-            date.getMinutes() +
-            "-" +
-            (date.getHours() + 2) +
-            ":" +
-            date.getMinutes(),
+          startTime: date.getFullYear() + "-" + Month + "-" + Day,
+          endTime: Hour + ":" + Minute + "-" + HourNext + ":" + Minute,
         });
         let data = encodeURIComponent(dataJson);
         let tempType =
@@ -288,7 +286,7 @@ export default {
       }
     },
 
-    // 提交表单给paperPaper组件
+    // 上传图片
     subForm(value) {
       console.log(this.form);
       let check = false;
@@ -310,20 +308,24 @@ export default {
 
       if (this.form.templateContent.split(".")[0] == "hd") {
         let date = new Date();
+        let Month =
+          date.getMonth() + 1 < 10
+            ? "0" + (date.getMonth() + 1)
+            : date.getMonth() + 1;
+        let Day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        let Hour =
+          date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        let Minute =
+          date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+        let HourNext = Hour + 2 > 24 ? 24 : Hour + 2;
         let dataJson = JSON.stringify({
           name: this.form.name,
           meetAdr: this.form.meetAdr,
           describe: this.form.describe,
           meetName: this.form.meetName,
           state: this.form.state,
-          startTime:
-            date.getFullYear() +
-            "-" +
-            (date.getMonth() + 1) +
-            "-" +
-            date.getDate(),
-          endTime:
-            date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(),
+          startTime: date.getFullYear() + "-" + Month + "-" + Day,
+          endTime: Hour + ":" + Minute + "-" + HourNext + ":" + Minute,
         });
         let temp_data = encodeURIComponent(dataJson);
         let temp_name =

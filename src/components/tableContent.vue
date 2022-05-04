@@ -93,16 +93,17 @@ export default {
       ePaperTemplate: {
         width: "",
         height: "",
-        temp_data: {
-          title: null,
-          user: "用户名",
-          test: "测试",
-          meetRoom: "会议室",
-          meetYMD: "2000-01-01",
-          meetStart: "14:30",
-          meetEnd: "15:30",
-          meetState: "会议中",
-        },
+        temp_data: "",
+        // {
+        //   title: null,
+        //   user: "用户名",
+        //   test: "测试",
+        //   meetRoom: "会议室",
+        //   meetYMD: "2000-01-01",
+        //   meetStart: "14:30",
+        //   meetEnd: "15:30",
+        //   meetState: "会议中",
+        // },
         temp_name: "名字",
       },
       formPaperData: "",
@@ -123,35 +124,38 @@ export default {
 
     // 展示编辑页面
     openFormScreen(e) {
+      console.log("e", this.tableData.length);
       this.ePaperTemplate.width = this.tableData[e].width;
       this.ePaperTemplate.height = this.tableData[e].height;
+      this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
+      this.ePaperTemplate.temp_data = this.tableData[e].temp_data;
       this.paperShowKey = Math.random();
 
       console.log(this.tableStoreId);
-      switch (this.ePaperTemplate.width) {
-        case 640:
-          this.ePaperTemplate.temp_data.title = "测试会议";
-          this.ePaperTemplate.temp_data.user = "用户名";
-          this.ePaperTemplate.temp_data.test = "测试1111";
-          this.ePaperTemplate.temp_data.meetRoom = "会议室";
-          this.ePaperTemplate.temp_data.meetYMD = "2000-01-01";
-          this.ePaperTemplate.temp_data.meetStart = "14:30";
-          this.ePaperTemplate.temp_data.meetEnd = "15:30";
-          this.ePaperTemplate.temp_data.meetState = "会议中";
-          this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
-          break;
-        case 400:
-          this.ePaperTemplate.temp_data.title = "测试会议";
-          this.ePaperTemplate.temp_data.user = "用户名";
-          this.ePaperTemplate.temp_data.test = "测试";
-          this.ePaperTemplate.temp_data.meetRoom = "会议室2222";
-          this.ePaperTemplate.temp_data.meetYMD = "2000-01-01";
-          this.ePaperTemplate.temp_data.meetStart = "14:30";
-          this.ePaperTemplate.temp_data.meetEnd = "15:30";
-          this.ePaperTemplate.temp_data.meetState = "会议中";
-          this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
-          break;
-      }
+      // switch (this.ePaperTemplate.width) {
+      //   case 640:
+      //     this.ePaperTemplate.temp_data.title = "测试会议";
+      //     this.ePaperTemplate.temp_data.user = "用户名";
+      //     this.ePaperTemplate.temp_data.test = "测试1111";
+      //     this.ePaperTemplate.temp_data.meetRoom = "会议室";
+      //     this.ePaperTemplate.temp_data.meetYMD = "2000-01-01";
+      //     this.ePaperTemplate.temp_data.meetStart = "14:30";
+      //     this.ePaperTemplate.temp_data.meetEnd = "15:30";
+      //     this.ePaperTemplate.temp_data.meetState = "会议中";
+      //     this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
+      //     break;
+      //   case 400:
+      //     this.ePaperTemplate.temp_data.title = "测试会议";
+      //     this.ePaperTemplate.temp_data.user = "用户名";
+      //     this.ePaperTemplate.temp_data.test = "测试";
+      //     this.ePaperTemplate.temp_data.meetRoom = "会议室2222";
+      //     this.ePaperTemplate.temp_data.meetYMD = "2000-01-01";
+      //     this.ePaperTemplate.temp_data.meetStart = "14:30";
+      //     this.ePaperTemplate.temp_data.meetEnd = "15:30";
+      //     this.ePaperTemplate.temp_data.meetState = "会议中";
+      //     this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
+      //     break;
+      // }
       this.templateScreen = this.tableData[e].model;
       setTimeout(() => {
         this.fullscreenLoading = false;
@@ -252,6 +256,7 @@ export default {
         tableData.width = res.data[i].epd_width;
         tableData.height = res.data[i].epd_height;
         tableData.temp_name = res.data[i].temp_name;
+        tableData.temp_data = res.data[i].temp_data;
         tableData.model =
           res.data[i].epd_ver.length > 0
             ? res.data[i].epd_ver +

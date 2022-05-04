@@ -15,16 +15,17 @@ export default {
         return {
           width: "",
           height: "",
-          temp_data: {
-            title: null,
-            user: "用户名",
-            test: "测试",
-            meetRoom: "会议室",
-            meetYMD: "2000-01-01",
-            meetStart: "14:30",
-            meetEnd: "15:30",
-            meetState: "会议中",
-          },
+          temp_data: "",
+          // {
+          //   title: null,
+          //   user: "用户名",
+          //   test: "测试",
+          //   meetRoom: "会议室",
+          //   meetYMD: "2000-01-01",
+          //   meetStart: "14:30",
+          //   meetEnd: "15:30",
+          //   meetState: "会议中",
+          // },
           temp_name: "名字",
         };
       },
@@ -60,22 +61,30 @@ export default {
       console.log("===", this.imgURL);
       let width = this.ePaperTemplate.width;
       let height = this.ePaperTemplate.height;
+      let temp_name = this.ePaperTemplate.temp_name;
+      let temp_data = this.ePaperTemplate.temp_data;
+      console.log("temp_data", temp_data);
       let id = this.imgURL.random;
       console.log("paper", id);
       if (this.imgURL.tempData == null) {
-        console.log("===init===");
-        let initData = {
-          meetAdr: "会议场所", // 会议场所
-          name: "姓名", // 姓名
-          describe: "职称或描述", // 职称或描述
-          meetName: "会议名称", // 会议名称
-          state: "状态", // 状态
-          startTime: "2001-01-01", // 开始时间
-          endTime: "18:00-20:00", // 结束时间
-        };
-        let initType = "hd640384";
-        initData = encodeURIComponent(JSON.stringify(initData));
-        return `/api/epd/img.bmp?width=${width}&height=${height}&type=${initType}&data=${initData}`;
+        // console.log("===init===");
+        // let initData = {
+        //   meetAdr: "会议场所", // 会议场所
+        //   name: "姓名", // 姓名
+        //   describe: "职称或描述", // 职称或描述
+        //   meetName: "会议名称", // 会议名称
+        //   state: "状态", // 状态
+        //   startTime: "2001-01-01", // 开始时间
+        //   endTime: "18:00-20:00", // 结束时间
+        // };
+        // let initType;
+        // if (width == "400") {
+        //   initType = "hd400300";
+        // } else {
+        //   initType = "hd640384";
+        // }
+        // initData = encodeURIComponent(JSON.stringify(initData));
+        return `/api/epd/img.bmp?width=${width}&height=${height}&type=${temp_name}&data=${temp_data}`;
       }
       console.log("===after===");
       console.log(this.imgURL.tempData);
