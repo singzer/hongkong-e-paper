@@ -470,7 +470,52 @@ export default {
     },
   },
   mounted() {
-    this.form.templateScreen = this.templateScreen;
+    let formData_index = this.$store.state.tableData[this.tableStoreId].ID;
+    if (this.$store.state.formData[formData_index] != null) {
+      if (
+        this.$store.state.formData[formData_index].temp_name.search("hd") != -1
+      ) {
+        this.form.templateContent = "hd.";
+        this.isShow = true;
+      }
+      if (
+        this.$store.state.formData[formData_index].temp_name.search("black") !=
+        -1
+      ) {
+        this.form.templateContent = "letter.black";
+        this.isShow = false;
+      }
+      if (
+        this.$store.state.formData[formData_index].temp_name.search("red") != -1
+      ) {
+        this.form.templateContent = "letter.red";
+        this.isShow = false;
+      }
+    } else {
+      if (
+        this.$store.state.tableData[this.tableStoreId].temp_name.search("hd") !=
+        -1
+      ) {
+        this.form.templateContent = "hd.";
+        this.isShow = true;
+      }
+      if (
+        this.$store.state.tableData[this.tableStoreId].temp_name.search(
+          "black"
+        ) != -1
+      ) {
+        this.form.templateContent = "letter.black";
+        this.isShow = false;
+      }
+      if (
+        this.$store.state.tableData[this.tableStoreId].temp_name.search(
+          "red"
+        ) != -1
+      ) {
+        this.form.templateContent = "letter.red";
+        this.isShow = false;
+      }
+    }
   },
 };
 </script>

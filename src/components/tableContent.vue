@@ -1,17 +1,24 @@
 <template>
   <div class="table-content">
     <el-table :data="tableData" style="width: 100%; font-size: 15px">
+      <el-table-column prop="number" label="编号" width="50"> </el-table-column>
+      <el-table-column prop="name" label="名字"> </el-table-column>
       <el-table-column prop="model" label="屏幕型号"> </el-table-column>
       <el-table-column prop="ip" label="设备IP"> </el-table-column>
       <el-table-column prop="mac" label="设备MAC"> </el-table-column>
       <el-table-column prop="ssid" label="SSID"> </el-table-column>
-      <el-table-column prop="signal" label="信号强度"> </el-table-column>
-      <el-table-column prop="battery" label="电池电量"> </el-table-column>
-      <el-table-column prop="templateNumber" label="模板编号">
+      <el-table-column prop="rssi" label="信号强度"> </el-table-column>
+      <el-table-column prop="battery_percentage" label="电池电量">
+      </el-table-column>
+      <el-table-column prop="temp_name_format" label="模板名字">
+        <!-- templateNumber -->
       </el-table-column>
       <el-table-column prop="state" label="内容状态"> </el-table-column>
-      <el-table-column prop="refreshTime" label="刷新时间"></el-table-column>
-      <el-table-column prop="lastTime" label="最后上线时间"></el-table-column>
+      <el-table-column
+        prop="last_refresh_at"
+        label="刷新时间"
+      ></el-table-column>
+      <el-table-column prop="UpdatedAt" label="最后上线时间"></el-table-column>
       <el-table-column prop="operate" label="操作" width="300">
         <template slot-scope="scope">
           <el-button
@@ -52,6 +59,7 @@
             :imgURL="imgURL"
             :paperID="paperID"
             id="test"
+            @watchFormEvent="watchFormEvent"
           ></paper-show>
         </el-col>
       </el-row>
@@ -160,7 +168,7 @@ export default {
       setTimeout(() => {
         this.fullscreenLoading = false;
       }, 3000);
-      this.formID = this.tableData[e].id;
+      this.formID = this.tableData[e].ID;
       this.fullscreenLoading = true;
       this.dialogFormVisible = true;
       this.tableStoreId = e;
@@ -180,7 +188,6 @@ export default {
         index: e,
         contentURL: `/api/epd/img.bmp?width=${width}&height=${height}&type=${temp_name}&data=${temp_data}`,
       };
-      console.log(this.contentParams);
     },
 
     // 下发内容
@@ -228,31 +235,30 @@ export default {
           mac: "",
           ssid: "",
           signal: "",
-          battery: "",
-          templateNumber: "",
+          battery_percentage: "",
           state: "",
-          refreshTime: "",
-          lastTime: "",
+          last_refresh_at: "",
+          UpdatedAt: "",
           operate: "",
-          id: null,
+          ID: null,
           width: "",
           height: "",
           temp_name: "",
+          number: null,
+          name: "",
+          temp_name_format: "",
         };
         tableData.ip = res.data[i].ip;
         tableData.mac = res.data[i].mac;
-        tableData.signal =
+        tableData.rssi =
           res.data[i].rssi.length > 0 ? res.data[i].rssi + "db" : "";
-        tableData.battery = res.data[i].battery_percentage + "%";
-        tableData.templateNumber = res.data[i].ID;
-        tableData.refreshTime = new Date(
-          res.data[i].UpdatedAt
-        ).toLocaleString();
-        tableData.lastTime = new Date(
+        tableData.battery_percentage = res.data[i].battery_percentage + "%";
+        tableData.last_refresh_at = new Date(
           res.data[i].last_refresh_at
         ).toLocaleString();
+        tableData.UpdatedAt = new Date(res.data[i].UpdatedAt).toLocaleString();
         tableData.ssid = res.data[i].ssid;
-        tableData.id = res.data[i].ID;
+        tableData.ID = res.data[i].ID;
         tableData.width = res.data[i].epd_width;
         tableData.height = res.data[i].epd_height;
         tableData.temp_name = res.data[i].temp_name;
@@ -265,10 +271,21 @@ export default {
               "*" +
               res.data[i].epd_height
             : res.data[i].epd_width + "*" + res.data[i].epd_height;
-        if (res.data[i].battery_is_charging == true) {
-          tableData.state = "正常";
+        tableData.number = i + 1;
+        tableData.name = res.data[i].name;
+        if (tableData.temp_name.search("hd") != -1) {
+          tableData.temp_name_format = "会议桌签";
+        }
+        if (tableData.temp_name.search("black") != -1) {
+          tableData.temp_name_format = "图书馆引导牌黑底";
+        }
+        if (tableData.temp_name.search("red") != -1) {
+          tableData.temp_name_format = "图书馆引导牌红底";
+        }
+        if (res.data[i].next_temp_data != "") {
+          tableData.state = "等待唤醒";
         } else {
-          tableData.state = "不正常";
+          tableData.state = "已刷新";
         }
         this.tableData.push(tableData);
         // console.log(tableData)
@@ -277,6 +294,36 @@ export default {
     document.getElementsByClassName(
       "el-table__body-wrapper"
     )[0].style.overflowX = "clip";
+    setInterval(() => {
+      this.$ajax.get("/api/epd/devices").then((res) => {
+        this.$store.commit("setTableData", res.data);
+        res.data.forEach((item, index) => {
+          if (this.tableData[index].temp_data != item.temp_data) {
+            this.tableData[index].temp_data = item.temp_data;
+          }
+          if (this.tableData[index].temp_name != item.temp_name) {
+            this.tableData[index].temp_name = item.temp_name;
+            if (item.temp_name.search("hd") != -1) {
+              this.tableData.temp_name_format = "会议桌签";
+            }
+            if (item.temp_name.search("black") != -1) {
+              this.tableData.temp_name_format = "图书馆引导牌黑底";
+            }
+            if (item.temp_name.search("red") != -1) {
+              this.tableData.temp_name_format = "图书馆引导牌红底";
+            }
+          }
+          if (this.tableData[index].next_temp_data != item.next_temp_data) {
+            this.tableData[index].next_temp_data = item.next_temp_data;
+            if (item.next_temp_data != "") {
+              this.tableData[index].state = "等待唤醒";
+            } else {
+              this.tableData[index].state = "已刷新";
+            }
+          }
+        });
+      });
+    }, 5000);
   },
 };
 </script>
