@@ -134,8 +134,16 @@ export default {
       console.log("e", this.tableData.length);
       this.ePaperTemplate.width = this.tableData[e].width;
       this.ePaperTemplate.height = this.tableData[e].height;
-      this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
-      this.ePaperTemplate.temp_data = this.tableData[e].temp_data;
+      let formData_index = this.tableData[e].ID;
+      if (this.$store.state.formData[formData_index] != null) {
+        this.ePaperTemplate.temp_data =
+          this.$store.state.formData[formData_index].temp_data;
+        this.ePaperTemplate.temp_name =
+          this.$store.state.formData[formData_index].temp_name;
+      } else {
+        this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
+        this.ePaperTemplate.temp_data = this.tableData[e].temp_data;
+      }
       this.paperShowKey = Math.random();
 
       console.log(this.tableStoreId);
