@@ -183,6 +183,7 @@ export default {
       },
       previewLock: 0,
       cacheData: {},
+      loading: null,
     };
   },
   computed: {
@@ -402,14 +403,16 @@ export default {
     // selectChange
     selectChange(value) {
       let e_paperDom = document.getElementById("e-paper");
-
+      if (this.loading != null) {
+        this.loading.close();
+      }
       const loading = this.$loading({
         lock: true,
         text: "Loading",
-        // spinner: 'el-icon-loading',
         target: ".box-card",
         background: "rgba(0, 0, 0, 0.7)",
       });
+      this.loading = loading;
       if (value.split(".")[0] == "hd") {
         this.isShow = true;
         let date = new Date();
