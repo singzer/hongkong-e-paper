@@ -50,26 +50,45 @@ export default {
       this.dialogFormVisible = true;
     },
     subs() {
-      this.$store.state.formData.forEach((element, index) => {
-        console.log("element", element);
-        console.log("index", index);
-        this.$ajax({
-          method: "post",
-          url: `/api/epd/device/${index}/setTemp`,
-          data: {
-            temp_data: element[index].temp_data,
-            temp_name: element[index].temp_name,
-          },
-          dataType: "json",
-        }).then((res) => {
-          console.log(res);
-          if (res.code == 200) {
-            this.$message("上传成功");
-          } else {
-            this.$message("上传失败");
-            return;
-          }
-        });
+      this.$store.state.tableData.forEach((element, index) => {
+        if (element.next_temp_data != "") {
+          let next_temp_data = element.next_temp_data;
+          let next_temp_name = element.next_temp_name;
+          this.$ajax({
+            method: "post",
+            url: `/api/epd/device/${index}/setTemp`,
+            data: {
+              next_temp_data: next_temp_data,
+              next_temp_name: next_temp_name,
+            },
+            dataType: "json",
+          });
+        } else {
+          console.log("12122批量下发");
+          console.log(element);
+          this.$ajax({
+            method: "post",
+            url: `/api/epd/device/${index}/setTemp`,
+            data: {
+              temp_data: element.temp_data,
+              temp_name: element.temp_name,
+            },
+            dataType: "json",
+          }).then((res) => {
+            console.log(res);
+            if (res.code == 200) {
+              return;
+            } else {
+              return;
+            }
+          });
+        }
+        if (index + 1 == this.$store.state.tableData.length) {
+          this.$message({
+            message: "下发成功",
+            type: "success",
+          });
+        }
       });
     },
   },

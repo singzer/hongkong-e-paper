@@ -194,31 +194,68 @@ export default {
       let id = String(this.$store.state.tableData[e].ID);
       let formDatas = this.$store.state.formData[id];
       let url = `/api/epd/device/${id}/setTemp`;
-      this.$ajax({
-        method: "post",
-        url: url,
-        data: {
-          temp_name: formDatas.temp_name,
-          temp_data: formDatas.temp_data,
-        },
-        dataType: "json",
-      })
-        .then((res) => {
+      if (formDatas != null) {
+        console.log("zks");
+        this.$ajax({
+          method: "post",
+          url: url,
+          data: {
+            temp_name: formDatas.temp_name,
+            temp_data: formDatas.temp_data,
+          },
+          dataType: "json",
+        })
+          .then((res) => {
+            if (res.code == 200) {
+              this.$message({
+                message: "下发成功",
+                type: "success",
+              });
+            } else {
+              this.$message({
+                message: "下发失败",
+                type: "error",
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        id = String(this.$store.state.tableData[e].ID);
+        url = `/api/epd/device/${id}/setTemp`;
+        console.log("url", url);
+        let temp_data =
+          this.$store.state.tableData[e].next_temp_data == ""
+            ? this.$store.state.tableData[e].temp_data
+            : this.$store.state.tableData[e].next_temp_data;
+        let temp_name =
+          this.$store.state.tableData[e].next_temp_name == ""
+            ? this.$store.state.tableData[e].temp_name
+            : this.$store.state.tableData[e].next_temp_name;
+        this.$ajax({
+          url: url,
+          method: "post",
+          data: {
+            temp_name: temp_name,
+            temp_data: temp_data,
+          },
+          dataType: "json",
+        }).then((res) => {
           if (res.code == 200) {
             this.$message({
               message: "下发成功",
               type: "success",
             });
-          } else {
-            this.$message({
-              message: "下发失败",
-              type: "error",
-            });
+            return;
           }
-        })
-        .catch((err) => {
-          console.log(err);
+          this.$message({
+            url: url,
+            message: "下发失败",
+            type: "error",
+          });
         });
+      }
     },
   },
   computed: {},
