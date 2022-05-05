@@ -183,7 +183,8 @@ export default {
       },
       previewLock: 0,
       cacheData: {},
-      loading: null,
+      select_loading: null,
+      preview_loading: null,
     };
   },
   computed: {
@@ -236,6 +237,10 @@ export default {
           return;
         }
         console.log("进入预览");
+        if (this.preview_loading != null) {
+          console.log("loadingValue", this.preview_loading);
+          this.preview_loading.close();
+        }
         const loading = this.$loading({
           lock: true,
           text: "Loading",
@@ -243,6 +248,7 @@ export default {
           target: ".box-card",
           background: "rgba(0, 0, 0, 0.7)",
         });
+        this.preview_loading = loading;
         this.$emit("formMes", {
           tempType: tempType,
           tempData: data,
@@ -269,10 +275,15 @@ export default {
         ) {
           return;
         }
+        console.log("12121212121111111111111111");
         this.$emit("formMes", {
           tempType: tempType,
           tempData: data,
         });
+        if (this.preview_loading != null) {
+          console.log("loadingValue", this.preview_loading);
+          this.preview_loading.close();
+        }
         const loading = this.$loading({
           lock: true,
           text: "Loading",
@@ -280,6 +291,8 @@ export default {
           target: ".box-card",
           background: "rgba(0, 0, 0, 0.7)",
         });
+        this.preview_loading = loading;
+        console.log("testLoading", loading);
         e_paperDom.onload = function () {
           loading.close();
         };
@@ -403,8 +416,8 @@ export default {
     // selectChange
     selectChange(value) {
       let e_paperDom = document.getElementById("e-paper");
-      if (this.loading != null) {
-        this.loading.close();
+      if (this.select_loading != null) {
+        this.select_loading.close();
       }
       const loading = this.$loading({
         lock: true,
@@ -412,7 +425,7 @@ export default {
         target: ".box-card",
         background: "rgba(0, 0, 0, 0.7)",
       });
-      this.loading = loading;
+      this.select_loading = loading;
       if (value.split(".")[0] == "hd") {
         this.isShow = true;
         let date = new Date();
@@ -475,10 +488,19 @@ export default {
   mounted() {
     let formData_index = this.$store.state.tableData[this.tableStoreId].ID;
     if (this.$store.state.formData[formData_index] != null) {
+      let temp_data = decodeURIComponent(
+        this.$store.state.formData[formData_index].temp_data
+      );
+      temp_data = JSON.parse(temp_data);
       if (
         this.$store.state.formData[formData_index].temp_name.search("hd") != -1
       ) {
         this.form.templateContent = "hd.";
+        this.form.meetAdr = temp_data.meetAdr;
+        this.form.describe = temp_data.describe;
+        this.form.meetName = temp_data.meetName;
+        this.form.state = temp_data.state;
+        this.form.name = temp_data.name;
         this.isShow = true;
       }
       if (
@@ -486,20 +508,31 @@ export default {
         -1
       ) {
         this.form.templateContent = "letter.black";
+        this.form.text = temp_data.text;
         this.isShow = false;
       }
       if (
         this.$store.state.formData[formData_index].temp_name.search("red") != -1
       ) {
         this.form.templateContent = "letter.red";
+        this.form.text = temp_data.text;
         this.isShow = false;
       }
     } else {
+      let temp_data = this.$store.state.tableData[this.tableStoreId].temp_data;
+      temp_data = decodeURIComponent(temp_data);
+      temp_data = JSON.parse(temp_data);
       if (
         this.$store.state.tableData[this.tableStoreId].temp_name.search("hd") !=
         -1
       ) {
         this.form.templateContent = "hd.";
+        this.form.meetAdr = temp_data.meetAdr;
+        this.form.describe = temp_data.describe;
+        this.form.meetName = temp_data.meetName;
+        this.form.state = temp_data.state;
+        this.form.name = temp_data.name;
+        console.log("this.form", this.form);
         this.isShow = true;
       }
       if (
@@ -508,6 +541,7 @@ export default {
         ) != -1
       ) {
         this.form.templateContent = "letter.black";
+        this.form.text = temp_data.text;
         this.isShow = false;
       }
       if (
@@ -516,6 +550,7 @@ export default {
         ) != -1
       ) {
         this.form.templateContent = "letter.red";
+        this.form.text = temp_data.text;
         this.isShow = false;
       }
     }

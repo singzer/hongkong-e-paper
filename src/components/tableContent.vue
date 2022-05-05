@@ -59,7 +59,6 @@
             :imgURL="imgURL"
             :paperID="paperID"
             id="test"
-            @watchFormEvent="watchFormEvent"
           ></paper-show>
         </el-col>
       </el-row>
