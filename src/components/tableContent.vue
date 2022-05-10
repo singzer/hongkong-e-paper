@@ -172,7 +172,7 @@ export default {
       this.templateScreen = this.tableData[e].model;
       setTimeout(() => {
         this.fullscreenLoading = false;
-      }, 2);
+      }, 2000);
       console.log("end");
       this.formID = this.tableData[e].ID;
       this.fullscreenLoading = true;
