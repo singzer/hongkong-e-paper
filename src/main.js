@@ -44,6 +44,8 @@ let store = new Vuex.Store({
   state: {
     tableData: [],
     formData: new Array(),
+    imgURL: new Map(),
+    default_img: new Map(),
   },
   mutations: {
     setTableData (state, data) {
@@ -52,6 +54,12 @@ let store = new Vuex.Store({
     },
     setFormData (state, data) {
         state.formData[data.index] = data.data
+    },
+    setImg (state, data) {
+        state.imgURL.set(data.key, data.value)
+    },
+    setDefaultImg (state, data) {
+        state.default_img.set(data.key, data.value)
     }
   }
 })

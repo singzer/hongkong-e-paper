@@ -2,7 +2,20 @@
   <div class="table-content">
     <el-table :data="tableData" style="width: 100%; font-size: 15px">
       <el-table-column prop="number" label="编号" width="50"> </el-table-column>
-      <el-table-column prop="name" label="名字"> </el-table-column>
+      <el-table-column prop="name" label="名字">
+        <template slot-scope="scope">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="点击更改设备名字"
+            placement="right"
+          >
+            <span class="text" @click="test(scope.$index)">{{
+              scope.row.name
+            }}</span>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column prop="model" label="屏幕型号"> </el-table-column>
       <el-table-column prop="ip" label="设备IP"> </el-table-column>
       <el-table-column prop="mac" label="设备MAC"> </el-table-column>
@@ -101,16 +114,6 @@ export default {
         width: "",
         height: "",
         temp_data: "",
-        // {
-        //   title: null,
-        //   user: "用户名",
-        //   test: "测试",
-        //   meetRoom: "会议室",
-        //   meetYMD: "2000-01-01",
-        //   meetStart: "14:30",
-        //   meetEnd: "15:30",
-        //   meetState: "会议中",
-        // },
         temp_name: "名字",
       },
       formPaperData: "",
@@ -121,9 +124,28 @@ export default {
     };
   },
   methods: {
-    test() {
+    test(e) {
       // this.templateScreen = this.tableData[e].model;
-      // this.dialogFormVisible = true;
+      // this.dialogFormVisible = true;\
+      this.$prompt("请输入模板名字", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }).then(({ value }) => {
+        this.$ajax({
+          url: `/api/epd/device/${e + 1}/rename`,
+          method: "POST",
+          data: {
+            name: value,
+          },
+          success: (res) => {
+            if (res.code == 200) {
+              this.$message.success("修改成功");
+            } else {
+              this.$message.error("修改失败");
+            }
+          },
+        });
+      });
     },
     imgURLMes(e) {
       this.imgURL = e;
@@ -146,35 +168,12 @@ export default {
       }
       this.paperShowKey = Math.random();
 
-      console.log(this.tableStoreId);
-      // switch (this.ePaperTemplate.width) {
-      //   case 640:
-      //     this.ePaperTemplate.temp_data.title = "测试会议";
-      //     this.ePaperTemplate.temp_data.user = "用户名";
-      //     this.ePaperTemplate.temp_data.test = "测试1111";
-      //     this.ePaperTemplate.temp_data.meetRoom = "会议室";
-      //     this.ePaperTemplate.temp_data.meetYMD = "2000-01-01";
-      //     this.ePaperTemplate.temp_data.meetStart = "14:30";
-      //     this.ePaperTemplate.temp_data.meetEnd = "15:30";
-      //     this.ePaperTemplate.temp_data.meetState = "会议中";
-      //     this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
-      //     break;
-      //   case 400:
-      //     this.ePaperTemplate.temp_data.title = "测试会议";
-      //     this.ePaperTemplate.temp_data.user = "用户名";
-      //     this.ePaperTemplate.temp_data.test = "测试";
-      //     this.ePaperTemplate.temp_data.meetRoom = "会议室2222";
-      //     this.ePaperTemplate.temp_data.meetYMD = "2000-01-01";
-      //     this.ePaperTemplate.temp_data.meetStart = "14:30";
-      //     this.ePaperTemplate.temp_data.meetEnd = "15:30";
-      //     this.ePaperTemplate.temp_data.meetState = "会议中";
-      //     this.ePaperTemplate.temp_name = this.tableData[e].temp_name;
-      //     break;
-      // }
+      console.log("numn", this.tableStoreId);
       this.templateScreen = this.tableData[e].model;
       setTimeout(() => {
         this.fullscreenLoading = false;
-      }, 3000);
+      }, 2);
+      console.log("end");
       this.formID = this.tableData[e].ID;
       this.fullscreenLoading = true;
       this.dialogFormVisible = true;
@@ -268,10 +267,22 @@ export default {
   },
   computed: {},
   mounted() {
+    let null_640384img = new Image();
+    let null_400300img = new Image();
+    null_640384img.src = "api/epd/img.bmp?width=640&height=384&type=&data=";
+    null_400300img.src = "api/epd/img.bmp?width=400&height=300&type=&data=";
+    null_640384img.width = "640";
+    null_640384img.height = "384";
+    null_640384img.style.backgroundColor = "red";
+    null_640384img.id = "imgContent";
+
+    null_400300img.width = "400";
+    null_400300img.height = "300";
+    null_400300img.style.backgroundColor = "red";
+    null_400300img.id = "imgContent";
     this.$ajax.get("/api/epd/devices").then((res) => {
       // console.log(res.data)
       this.$store.commit("setTableData", res.data);
-      console.log(this.$store.state.tableData);
       for (let i = 0; i < res.data.length; i++) {
         let tableData = {
           model: "",
@@ -332,7 +343,40 @@ export default {
           tableData.state = "已刷新";
         }
         this.tableData.push(tableData);
-        // console.log(tableData)
+        // 预缓存数据
+        let imgURL = `api/epd/img.bmp?width=${tableData.width}&height=${tableData.height}&type=${tableData.temp_name}&data=${tableData.temp_data}`;
+        let current_img = new Image();
+        let next_img = new Image();
+        current_img.src = imgURL;
+        current_img.width = tableData.width;
+        current_img.height = tableData.height;
+        current_img.style.backgroundColor = "red";
+        current_img.id = "imgContent";
+        if (res.data[i].next_temp_data != "") {
+          let next_temp_name = res.data[i].next_temp_name;
+          let next_temp_data = res.data[i].next_temp_data;
+          next_img.src = `api/epd/img.bmp?width=${tableData.width}&height=${tableData.height}&type=${next_temp_name}&data=${next_temp_data}`;
+          next_img.width = tableData.width;
+          next_img.height = tableData.height;
+          next_img.style.backgroundColor = "red";
+          next_img.id = "imgContent";
+        } else {
+          switch (res.data[i].epd_width) {
+            case 640:
+              next_img = null_640384img;
+              break;
+            case 400:
+              next_img = null_400300img;
+              break;
+          }
+        }
+        this.$store.commit("setImg", {
+          key: String(i),
+          value: {
+            current_img: current_img,
+            next_img: next_img,
+          },
+        });
       }
     });
     document.getElementsByClassName(
@@ -344,6 +388,38 @@ export default {
         res.data.forEach((item, index) => {
           if (this.tableData[index].temp_data != item.temp_data) {
             this.tableData[index].temp_data = item.temp_data;
+            let img = new Image();
+            img.src = `/api/epd/img.bmp?width=${item.epd_width}&height=${item.epd_height}&type=${item.temp_name}&data=${item.temp_data}`;
+            img.width = item.epd_width;
+            img.height = item.epd_height;
+            img.style.backgroundColor = "red";
+            img.id = "imgContent";
+            this.$store.state.imgURL.get(String(index)).current_img = img;
+          }
+          if (item.next_temp_data != "") {
+            let next_img = new Image();
+            next_img.src = `/api/epd/img.bmp?width=${item.epd_width}&height=${item.epd_height}&type=${item.next_temp_name}&data=${item.next_temp_data}`;
+            next_img.width = item.epd_width;
+            next_img.height = item.epd_height;
+            next_img.style.backgroundColor = "red";
+            next_img.id = "imgContent";
+            this.$store.state.imgURL.get(String(index)).next_img = next_img;
+          } else {
+            switch (item.epd_width) {
+              case 640:
+                this.$store.state.imgURL.get(String(index)).next_img =
+                  null_640384img;
+                break;
+              case 400:
+                this.$store.state.imgURL.get(String(index)).next_img =
+                  null_400300img;
+                break;
+            }
+          }
+
+          if (item.temp_data == "") {
+            this.$store.state.imgURL.get(String(index)).temp_data =
+              item.epd_width == 640 ? null_640384img : null_400300img;
           }
           if (this.tableData[index].temp_name != item.temp_name) {
             this.tableData[index].temp_name = item.temp_name;
@@ -365,9 +441,91 @@ export default {
               this.tableData[index].state = "已刷新";
             }
           }
+          this.tableData[index].last_refresh_at = new Date(
+            item.last_refresh_at
+          ).toLocaleString();
+          this.tableData[index].UpdatedAt = new Date(
+            item.UpdatedAt
+          ).toLocaleString();
+          this.tableData[index].ssid = item.ssid;
+          this.tableData[index].ID = item.ID;
+          this.tableData[index].width = item.epd_width;
+          this.tableData[index].height = item.epd_height;
+          this.tableData[index].temp_name = item.temp_name;
+          this.tableData[index].temp_data = item.temp_data;
+          this.tableData[index].model =
+            item.epd_ver.length > 0
+              ? item.epd_ver + "-" + item.epd_width + "*" + item.epd_height
+              : item.epd_width + "*" + item.epd_height;
+          this.tableData[index].number = index + 1;
+          this.tableData[index].name = item.name;
         });
       });
     }, 5000);
+  },
+  created() {
+    // let default_400300img_letter_black = new Image();
+    // let default_letter_data = JSON.stringify({
+    //   text: "文本内容",
+    // });
+    // default_letter_data = encodeURIComponent(default_letter_data);
+    // default_400300img_letter_black.src =
+    //   "/api/epd/img.bmp?width=400&height=300&type=letter400300black&data=" +
+    //   default_letter_data;
+    // let default_400300img_letter_red = new Image();
+    // default_400300img_letter_red.src =
+    //   "/api/epd/img.bmp?width=400&height=300&type=letter400300red&data=" +
+    //   default_letter_data;
+    // let default_640384img_letter_black = new Image();
+    // default_640384img_letter_black.src =
+    //   "/api/epd/img.bmp?width=640&height=384&type=letter640384black&data=" +
+    //   default_letter_data;
+    // let default_640384img_letter_red = new Image();
+    // default_640384img_letter_red.src =
+    //   "/api/epd/img.bmp?width=640&height=384&type=letter640384red&data=" +
+    //   default_letter_data;
+    // let default_640384img_hd = new Image();
+    // let default_hd_data = JSON.stringify({
+    //   name: "姓名",
+    //   describe: "职称或描述",
+    //   meetName: "会议名称",
+    //   state: "状态",
+    //   meetAdr: "会议场所",
+    //   text: "文本内容",
+    //   startTime: "2002-01-01",
+    //   endTime: "10:20-12:00",
+    // });
+    // default_640384img_hd.src =
+    //   "/api/epd/img.bmp?width=640&height=384&type=hd640384&data=" +
+    //   default_hd_data;
+    // let default_400300img_hd = new Image();
+    // default_400300img_hd.src =
+    //   "/api/epd/img.bmp?width=400&height=300&type=hd400300&data=" +
+    //   default_hd_data;
+    // this.$store.commit("setDefaultImg", {
+    //   key: "default_400300img_letter_black",
+    //   value: default_400300img_letter_black,
+    // });
+    // this.$store.commit("setDefaultImg", {
+    //   key: "default_400300img_letter_red",
+    //   value: default_400300img_letter_red,
+    // });
+    // this.$store.commit("setDefaultImg", {
+    //   key: "default_640384img_letter_black",
+    //   value: default_640384img_letter_black,
+    // });
+    // this.$store.commit("setDefaultImg", {
+    //   key: "default_640384img_letter_red",
+    //   value: default_640384img_letter_red,
+    // });
+    // this.$store.commit("setDefaultImg", {
+    //   key: "default_640384img_hd",
+    //   value: default_640384img_hd,
+    // });
+    // this.$store.commit("setDefaultImg", {
+    //   key: "default_400300img_hd",
+    //   value: default_400300img_hd,
+    // });
   },
 };
 </script>

@@ -7,11 +7,7 @@
       ref="formData"
     >
       <el-form-item label="模板画面">
-        <el-select
-          :placeholder="templateScreen"
-          :disabled="true"
-          v-model="form.templateScreen"
-        >
+        <el-select :disabled="true" v-model="form.templateScreen">
           <!-- <el-option label="区域一" value="shanghai"></el-option> -->
           <!-- <el-option label="区域二" value="beijing"></el-option> -->
         </el-select>
@@ -29,6 +25,9 @@
           <!-- <el-option label="图书馆引导牌3" value="图书馆引导牌3"></el-option> -->
           <!-- <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option> -->
         </el-select>
+      </el-form-item>
+      <el-form-item label="设备名称" prop="null">
+        <el-input v-model="form.deviceName"></el-input>
       </el-form-item>
       <el-form-item label="会议场所" prop="meetAdr" v-if="isShow">
         <el-input
@@ -157,6 +156,7 @@ export default {
         describe: "", // 职称或描述
         meetName: "", // 会议名称
         state: "", // 状态
+        deviceName: "", //设备名称
         text: "文本内容", // 文本内容
       },
       rules: {
@@ -185,6 +185,7 @@ export default {
       cacheData: {},
       select_loading: null,
       preview_loading: null,
+      deviceName: "", // 起始设备名字
     };
   },
   computed: {
@@ -236,7 +237,6 @@ export default {
         ) {
           return;
         }
-        console.log("进入预览");
         if (this.preview_loading != null) {
           console.log("loadingValue", this.preview_loading);
           this.preview_loading.close();
@@ -275,7 +275,6 @@ export default {
         ) {
           return;
         }
-        console.log("12121212121111111111111111");
         this.$emit("formMes", {
           tempType: tempType,
           tempData: data,
@@ -303,6 +302,7 @@ export default {
     // 上传图片
     subForm(value) {
       console.log(this.form);
+
       let check = false;
       this.$refs[value].validate((valid) => {
         if (!valid) {
@@ -373,6 +373,23 @@ export default {
             return;
           }
         });
+        console.log("rename");
+        this.$ajax({
+          method: "post",
+          url: `/api/epd/device/${this.formID}/rename`,
+          data: {
+            name: this.form.deviceName,
+          },
+          dataType: "json",
+        }).then((res) => {
+          if (res.code == 200) {
+            this.$message("修改成功");
+          } else {
+            this.$message("修改失败");
+            return;
+          }
+        });
+
         return;
       } else {
         let dataJson = JSON.stringify({
@@ -410,6 +427,21 @@ export default {
             return;
           }
         });
+        this.$ajax({
+          method: "post",
+          url: `/api/epd/device/${this.formID}/rename`,
+          data: {
+            name: this.form.deviceName,
+          },
+          dataType: "json",
+        }).then((res) => {
+          if (res.code == 200) {
+            this.$message("修改成功");
+          } else {
+            this.$message("修改失败");
+            return;
+          }
+        });
       }
     },
 
@@ -428,21 +460,23 @@ export default {
       this.select_loading = loading;
       if (value.split(".")[0] == "hd") {
         this.isShow = true;
-        let date = new Date();
+        // let date = new Date();
         let dataJson = JSON.stringify({
           name: this.initData.name,
           meetAdr: this.initData.meetAdr,
           describe: this.initData.describe,
           meetName: this.initData.meetName,
           state: this.initData.state,
-          startTime:
-            date.getFullYear() +
-            "-" +
-            (date.getMonth() + 1) +
-            "-" +
-            date.getDate(),
-          endTime:
-            date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(),
+          // startTime:
+          //   date.getFullYear() +
+          //   "-" +
+          //   (date.getMonth() + 1) +
+          //   "-" +
+          //   date.getDate(),
+          // endTime:
+          //   date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(),
+          startTime: "2002-01-01",
+          endTime: "10:20-12:00",
         });
         value =
           value.split(".")[0] +
@@ -487,6 +521,8 @@ export default {
   },
   mounted() {
     let formData_index = this.$store.state.tableData[this.tableStoreId].ID;
+    this.form.deviceName = this.$store.state.tableData[this.tableStoreId].name;
+    this.deviceName = this.form.deviceName;
     if (this.$store.state.formData[formData_index] != null) {
       let temp_data = decodeURIComponent(
         this.$store.state.formData[formData_index].temp_data

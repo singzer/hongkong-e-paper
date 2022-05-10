@@ -1,14 +1,17 @@
 <template>
   <div>
+    <el-button type="primary" @click="currentContent">当前内容</el-button>
+    <el-button type="success" @click="nextContent">下次内容</el-button>
     <el-card id="contentCard">
-      <img
+      <!-- <img
         id="imgContent"
         :src="contentParams.contentURL"
         :height="height"
         :width="width"
         style="background-color: red"
         ref="imgContent"
-      />
+      /> -->
+      <!-- <div id="img-panel">12</div> -->
     </el-card>
   </div>
 </template>
@@ -32,22 +35,51 @@ export default {
       height: "",
     };
   },
-  methods: {},
+  methods: {
+    currentContent() {
+      let img_panel = document.getElementById("contentCard").lastChild;
+      if (img_panel.lastChild != null) {
+        img_panel.removeChild(img_panel.lastChild);
+      }
+      img_panel.appendChild(
+        this.$store.state.imgURL.get(String(this.contentParams.index))
+          .current_img
+      );
+    },
+    nextContent() {
+      let img_panel = document.getElementById("contentCard").lastChild;
+      if (img_panel.lastChild != null) {
+        img_panel.removeChild(img_panel.lastChild);
+      }
+      img_panel.appendChild(
+        this.$store.state.imgURL.get(String(this.contentParams.index)).next_img
+      );
+    },
+  },
   mounted() {
     this.width =
       this.$store.state.tableData[this.contentParams.index].epd_width;
     this.height =
       this.$store.state.tableData[this.contentParams.index].epd_height;
 
-    const loading = this.$loading({
-      lock: true,
-      text: "Loading",
-      background: "rgba(0, 0, 0, 0.7)",
-      target: "#contentCard",
-    });
-    this.$refs["imgContent"].onload = () => {
-      loading.close();
-    };
+    // const loading = this.$loading({
+    //   lock: true,
+    //   text: "Loading",
+    //   background: "rgba(0, 0, 0, 0.7)",
+    //   target: "#contentCard",
+    // });
+    console.log(
+      "contentShow mounted",
+      this.$store.state.imgURL.get(String(this.contentParams.index))
+    );
+    let img_panel = document.getElementById("contentCard").lastChild;
+
+    img_panel.appendChild(
+      this.$store.state.imgURL.get(String(this.contentParams.index)).current_img
+    );
+    // this.$refs["imgContent"].onload = () => {
+    //   loading.close();
+    // };
   },
 };
 </script>
