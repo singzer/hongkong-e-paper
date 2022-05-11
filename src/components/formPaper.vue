@@ -26,9 +26,7 @@
           <!-- <el-option label="图书馆引导牌4" value="图书馆引导牌4"></el-option> -->
         </el-select>
       </el-form-item>
-      <el-form-item label="设备名称" prop="null">
-        <el-input v-model="form.deviceName"></el-input>
-      </el-form-item>
+
       <el-form-item label="会议场所" prop="meetAdr" v-if="isShow">
         <el-input
           v-model="form.meetAdr"
@@ -373,23 +371,6 @@ export default {
             return;
           }
         });
-        console.log("rename");
-        this.$ajax({
-          method: "post",
-          url: `/api/epd/device/${this.formID}/rename`,
-          data: {
-            name: this.form.deviceName,
-          },
-          dataType: "json",
-        }).then((res) => {
-          if (res.code == 200) {
-            this.$message("修改成功");
-          } else {
-            this.$message("修改失败");
-            return;
-          }
-        });
-
         return;
       } else {
         let dataJson = JSON.stringify({
@@ -424,21 +405,6 @@ export default {
             this.$message("上传成功");
           } else {
             this.$message("上传失败");
-            return;
-          }
-        });
-        this.$ajax({
-          method: "post",
-          url: `/api/epd/device/${this.formID}/rename`,
-          data: {
-            name: this.form.deviceName,
-          },
-          dataType: "json",
-        }).then((res) => {
-          if (res.code == 200) {
-            this.$message("修改成功");
-          } else {
-            this.$message("修改失败");
             return;
           }
         });

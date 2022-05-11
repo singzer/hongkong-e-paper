@@ -10,7 +10,7 @@
             content="点击更改设备名字"
             placement="right"
           >
-            <span class="text" @click="test(scope.$index)">{{
+            <span class="text" @click="deviceRename(scope.$index)">{{
               scope.row.name
             }}</span>
           </el-tooltip>
@@ -124,15 +124,14 @@ export default {
     };
   },
   methods: {
-    test(e) {
-      // this.templateScreen = this.tableData[e].model;
-      // this.dialogFormVisible = true;\
+    deviceRename(e) {
+      let id = this.tableData[e].ID;
       this.$prompt("请输入模板名字", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
       }).then(({ value }) => {
         this.$ajax({
-          url: `/api/epd/device/${e + 1}/rename`,
+          url: `/api/epd/device/${id}/rename`,
           method: "POST",
           data: {
             name: value,
